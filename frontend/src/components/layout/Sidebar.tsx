@@ -1,50 +1,73 @@
 import React from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
-  CheckSquare,
+  LayoutDashboard,
   FileSearch,
-  Users,
+  CheckSquare,
   ScrollText,
   Layers,
   ChevronDown,
   ShieldAlert,
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
+import { useAuth } from '../../context/AuthContext'
+import type { UserRole } from '../../types/auth'
 
-export type UserRole =
-  | 'patient'
-  | 'doctor'
-  | 'senior_doctor'
-  | 'hospital_admin'
-  | 'system_admin'
+export const Sidebar: React.FC = () => {
+  const { user, switchRole } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
 
-interface SidebarProps {
-  currentRole: UserRole
-  onRoleChange: (role: UserRole) => void
-  activeNav: string
-  onNavChange: (nav: string) => void
-}
+  const currentRole = user?.role || 'doctor'
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  currentRole,
-  onRoleChange,
-  activeNav,
-  onNavChange,
-}) => {
   const navItems = [
-    { id: 'worklist', label: 'Worklist', icon: CheckSquare, badge: '4' },
-    { id: 'verification', label: 'Verification queue', icon: FileSearch, badge: '2' },
-    { id: 'patients', label: 'Patients', icon: Users },
-    { id: 'audit', label: 'Audit log', icon: ScrollText },
-    { id: 'dev-ui', label: 'UI primitives (/dev/ui)', icon: Layers },
+    {
+      id: 'dashboard',
+      path: '/dashboard',
+      label: 'Role Dashboard',
+      icon: LayoutDashboard,
+      roles: ['patient', 'doctor', 'senior_doctor', 'hospital_admin', 'system_admin'] as UserRole[],
+    },
+    {
+      id: 'verification',
+      path: '/verification',
+      label: 'Verification queue',
+      icon: FileSearch,
+      roles: ['doctor', 'senior_doctor', 'system_admin'] as UserRole[],
+    },
+    {
+      id: 'worklist',
+      path: '/worklist',
+      label: 'Clinical worklist',
+      icon: CheckSquare,
+      roles: ['doctor', 'senior_doctor'] as UserRole[],
+    },
+    {
+      id: 'audit',
+      path: '/audit',
+      label: 'Audit log',
+      icon: ScrollText,
+      roles: ['hospital_admin', 'system_admin', 'senior_doctor'] as UserRole[],
+    },
+    {
+      id: 'dev-ui',
+      path: '/dev/ui',
+      label: 'UI primitives (/dev/ui)',
+      icon: Layers,
+      roles: ['patient', 'doctor', 'senior_doctor', 'hospital_admin', 'system_admin'] as UserRole[],
+    },
   ]
 
   const roleOptions: { value: UserRole; label: string }[] = [
-    { value: 'patient', label: 'Patient' },
-    { value: 'doctor', label: 'Doctor' },
     { value: 'senior_doctor', label: 'Senior Doctor (Verifier)' },
+    { value: 'doctor', label: 'Doctor' },
+    { value: 'patient', label: 'Patient' },
     { value: 'hospital_admin', label: 'Hospital Admin' },
     { value: 'system_admin', label: 'System Admin' },
   ]
+
+  // Filter items visible for the active role
+  const visibleNavItems = navItems.filter((item) => item.roles.includes(currentRole))
 
   return (
     <aside className="w-56 bg-slate-100 border-r border-slate-200 flex flex-col justify-between shrink-0 select-none">
@@ -67,15 +90,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Navigation list */}
         <div className="p-2 space-y-0.5">
           <div className="px-2 py-1 text-2xs font-semibold text-slate-500 uppercase tracking-wider">
-            Clinical Workspace
+            Workspace Nav
           </div>
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon
-            const isActive = activeNav === item.id
+            const isActive =
+              location.pathname === item.path ||
+              (item.path === '/dashboard' && location.pathname === '/')
             return (
               <button
                 key={item.id}
-                onClick={() => onNavChange(item.id)}
+                onClick={() => navigate(item.path)}
                 className={cn(
                   'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-base transition-colors text-left',
                   isActive
@@ -92,18 +117,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   />
                   <span className="truncate">{item.label}</span>
                 </div>
-                {item.badge && (
-                  <span
-                    className={cn(
-                      'px-1.5 py-0.2 text-2xs font-mono rounded-full font-semibold',
-                      isActive
-                        ? 'bg-teal-900 text-teal-100'
-                        : 'bg-slate-200 text-slate-700'
-                    )}
-                  >
-                    {item.badge}
-                  </span>
-                )}
               </button>
             )
           })}
@@ -113,14 +126,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Role Switcher & Security Scope at bottom */}
       <div className="p-2 border-t border-slate-200 bg-white">
         <div className="px-1 mb-1.5 flex items-center justify-between text-2xs text-slate-500">
-          <span className="font-semibold uppercase tracking-wider">Active Role</span>
-          <span className="text-2xs text-teal-700 font-mono">Formula check</span>
+          <span className="font-semibold uppercase tracking-wider">Switch Role</span>
+          <span className="text-2xs text-teal-700 font-mono">Scope check</span>
         </div>
         <div className="relative">
           <select
             value={currentRole}
-            onChange={(e) => onRoleChange(e.target.value as UserRole)}
-            className="w-full appearance-none bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded px-2.5 py-1.5 pr-6 font-medium focus:outline-none focus:border-teal-700"
+            onChange={(e) => switchRole(e.target.value as UserRole)}
+            className="w-full appearance-none bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded px-2.5 py-1.5 pr-6 font-medium focus:outline-none focus:border-teal-700 cursor-pointer"
           >
             {roleOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -137,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span>Policy: Default Deny</span>
           </div>
           <div>Role: <span className="font-mono text-slate-900 font-semibold">{currentRole}</span></div>
-          <div className="text-slate-500 mt-0.5">Denials audited to backend</div>
+          <div className="text-slate-500 mt-0.5">Query cache clears on role switch</div>
         </div>
       </div>
     </aside>

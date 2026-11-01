@@ -1,5 +1,6 @@
 import React from 'react'
-import { AlertCircle, User, ShieldCheck } from 'lucide-react'
+import { AlertCircle, User, ShieldCheck, LogOut } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 
 export interface PatientContext {
   id: string
@@ -28,6 +29,8 @@ const defaultPatient: PatientContext = {
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ patient = defaultPatient }) => {
+  const { user, logout } = useAuth()
+
   return (
     <header className="h-11 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0 select-none">
       {/* Patient Clinical Context */}
@@ -72,12 +75,29 @@ export const TopBar: React.FC<TopBarProps> = ({ patient = defaultPatient }) => {
         )}
       </div>
 
-      {/* Right metadata: Consent & Security state */}
-      <div className="flex items-center gap-2 text-xs">
-        <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 border border-teal-200 text-teal-800 text-2xs font-medium">
+      {/* Right metadata: Consent, Active User & Sign out */}
+      <div className="flex items-center gap-3 text-xs">
+        <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 border border-teal-200 text-teal-800 text-2xs font-medium">
           <ShieldCheck className="w-3 h-3 text-teal-700" />
           <span>Care Team Consent Active</span>
         </div>
+
+        {user && (
+          <>
+            <div className="h-4 w-[1px] bg-slate-200 shrink-0 hidden sm:block" />
+            <div className="flex items-center gap-2">
+              <span className="text-slate-700 font-medium hidden md:inline">{user.name}</span>
+              <button
+                onClick={logout}
+                title="Sign out of VeriCare"
+                className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-900 px-1.5 py-1 rounded hover:bg-slate-100 transition-colors"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="text-xs">Sign out</span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </header>
   )
