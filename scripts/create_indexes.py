@@ -45,9 +45,33 @@ async def create_indexes():
         IndexModel([("role", ASCENDING)], name="idx_audit_role"),
     ])
 
-    logger.info("Creating indexes for collection 'hospitals'...")
+    logger.info("Creating indexes for collection 'hospitals' and 'organizations'...")
     await db.hospitals.create_indexes([
         IndexModel([("hospital_id", ASCENDING)], unique=True, name="idx_hospitals_id_unique"),
+    ])
+    await db.organizations.create_indexes([
+        IndexModel([("hospital_id", ASCENDING)], unique=True, name="idx_organizations_id_unique"),
+    ])
+
+    logger.info("Creating indexes for collection 'patients'...")
+    await db.patients.create_indexes([
+        IndexModel([("patient_id", ASCENDING)], unique=True, name="idx_patients_id_unique"),
+        IndexModel([("mrn", ASCENDING)], unique=True, name="idx_patients_mrn_unique"),
+        IndexModel([("hospital_ids", ASCENDING)], name="idx_patients_hospitals"),
+    ])
+
+    logger.info("Creating indexes for collection 'care_team_memberships'...")
+    await db.care_team_memberships.create_indexes([
+        IndexModel([("care_team_id", ASCENDING), ("patient_id", ASCENDING)], name="idx_care_team_patient"),
+        IndexModel([("clinician_id", ASCENDING)], name="idx_care_team_clinician"),
+        IndexModel([("patient_id", ASCENDING)], name="idx_care_team_patient_only"),
+    ])
+
+    logger.info("Creating indexes for collection 'encounters'...")
+    await db.encounters.create_indexes([
+        IndexModel([("encounter_id", ASCENDING)], unique=True, name="idx_encounters_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("admission_date", ASCENDING)], name="idx_encounters_patient_date"),
+        IndexModel([("hospital_id", ASCENDING)], name="idx_encounters_hospital"),
     ])
 
     client.close()

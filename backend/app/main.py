@@ -9,6 +9,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from backend.app.api.v1.audit import router as audit_router
 from backend.app.api.v1.auth import router as auth_router
 from backend.app.api.v1.health import router as health_router
+from backend.app.api.v1.patients import router as patients_router
 from backend.app.api.v1.protected_demo import router as protected_router
 from backend.app.core.config import settings
 from backend.app.core.database import close_mongo_connection, connect_to_mongo
@@ -110,6 +111,7 @@ async def generic_exception_handler(request: Request, exc: Exception):
 api_v1_str = settings.API_V1_STR
 app.include_router(health_router, prefix=api_v1_str, tags=["Health"])
 app.include_router(auth_router, prefix=api_v1_str, tags=["Authentication"])
+app.include_router(patients_router, prefix=api_v1_str, tags=["Patients"])
 app.include_router(audit_router, prefix=api_v1_str, tags=["Audit Trail"])
 app.include_router(protected_router, prefix=api_v1_str, tags=["RBAC Protected"])
 

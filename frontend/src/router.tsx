@@ -3,6 +3,8 @@ import { AppLayout } from './components/layout/AppLayout'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { PatientDirectoryPage } from './pages/PatientDirectoryPage'
+import { PatientOverviewPage } from './pages/PatientOverviewPage'
 import { DevUiPage } from './pages/DevUiPage'
 import { EmptyState } from './components/ui/EmptyState'
 import { FileSearch, CheckSquare, ScrollText } from 'lucide-react'
@@ -27,6 +29,14 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <DashboardPage />,
+      },
+      {
+        path: 'patients',
+        element: <PatientDirectoryPage />,
+      },
+      {
+        path: 'patients/:id',
+        element: <PatientOverviewPage />,
       },
       {
         path: 'verification',

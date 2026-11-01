@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
+  Users,
   FileSearch,
   CheckSquare,
   ScrollText,
@@ -26,6 +27,13 @@ export const Sidebar: React.FC = () => {
       path: '/dashboard',
       label: 'Role Dashboard',
       icon: LayoutDashboard,
+      roles: ['patient', 'doctor', 'senior_doctor', 'hospital_admin', 'system_admin'] as UserRole[],
+    },
+    {
+      id: 'patients',
+      path: '/patients',
+      label: 'Patient Directory',
+      icon: Users,
       roles: ['patient', 'doctor', 'senior_doctor', 'hospital_admin', 'system_admin'] as UserRole[],
     },
     {
@@ -96,7 +104,8 @@ export const Sidebar: React.FC = () => {
             const Icon = item.icon
             const isActive =
               location.pathname === item.path ||
-              (item.path === '/dashboard' && location.pathname === '/')
+              (item.path === '/dashboard' && location.pathname === '/') ||
+              (item.path === '/patients' && location.pathname.startsWith('/patients'))
             return (
               <button
                 key={item.id}
