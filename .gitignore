@@ -28,6 +28,15 @@ venv/
 coverage/
 .pytest_cache/
 
+# Uploaded documents
+uploads/
+*.pdf
+
+# AI context / prompt docs
+docs/CONTEXT.md
+*CONTEXT*.md
+*PROMPT*.md
+
 # IDE & OS
 .vscode/
 .idea/

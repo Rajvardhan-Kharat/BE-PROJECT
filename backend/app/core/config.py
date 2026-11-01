@@ -28,6 +28,18 @@ class Settings(BaseSettings):
     # External Aria Service Adapter
     ARIA_SERVICE_URL: str = "http://localhost:8001"
 
+    # Uploads & Extraction Storage
+    UPLOAD_DIR: str = "uploads"
+    MAX_UPLOAD_SIZE_BYTES: int = 10 * 1024 * 1024  # 10 MB size cap
+    RATE_LIMIT_UPLOADS_PER_MINUTE: int = 20
+
+    # LLM Provider Configuration
+    LLM_PROVIDER_TYPE: Literal["mock", "real_stub"] = "mock"
+    LLM_API_KEY: str | None = None
+    LLM_API_URL: str = "https://api.openai.com/v1"
+    LLM_MODEL: str = "gpt-4o-mini"
+    LLM_TIMEOUT_SECONDS: float = 10.0
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

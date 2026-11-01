@@ -8,6 +8,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from backend.app.api.v1.audit import router as audit_router
 from backend.app.api.v1.auth import router as auth_router
+from backend.app.api.v1.documents import router as documents_router
 from backend.app.api.v1.health import router as health_router
 from backend.app.api.v1.patients import router as patients_router
 from backend.app.api.v1.protected_demo import router as protected_router
@@ -112,6 +113,7 @@ api_v1_str = settings.API_V1_STR
 app.include_router(health_router, prefix=api_v1_str, tags=["Health"])
 app.include_router(auth_router, prefix=api_v1_str, tags=["Authentication"])
 app.include_router(patients_router, prefix=api_v1_str, tags=["Patients"])
+app.include_router(documents_router, prefix=api_v1_str, tags=["Documents & Extraction"])
 app.include_router(audit_router, prefix=api_v1_str, tags=["Audit Trail"])
 app.include_router(protected_router, prefix=api_v1_str, tags=["RBAC Protected"])
 

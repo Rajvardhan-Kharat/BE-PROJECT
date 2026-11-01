@@ -74,6 +74,13 @@ async def create_indexes():
         IndexModel([("hospital_id", ASCENDING)], name="idx_encounters_hospital"),
     ])
 
+    logger.info("Creating indexes for collection 'untrusted_documents'...")
+    await db.untrusted_documents.create_indexes([
+        IndexModel([("document_id", ASCENDING)], unique=True, name="idx_untrusted_docs_id_unique"),
+        IndexModel([("content_hash", ASCENDING), ("patient_id", ASCENDING)], name="idx_untrusted_docs_hash_patient"),
+        IndexModel([("patient_id", ASCENDING)], name="idx_untrusted_docs_patient"),
+    ])
+
     client.close()
     logger.info("All MongoDB indexes created successfully.")
 
