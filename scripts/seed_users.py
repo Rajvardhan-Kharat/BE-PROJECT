@@ -452,6 +452,21 @@ def get_synthetic_users():
             "consent_active": True,
             "is_synthetic": True,
         },
+        # Patient 2 (Arthur Pendelton)
+        {
+            "user_id": "USR-PATIENT-002",
+            "name": "Arthur Pendelton",
+            "email": "patient.arthur@synthetic.vericare.internal",
+            "role": "patient",
+            "hashed_password": pw_hash,
+            "hospital_id": "HOSP-VALLEY-02",
+            "scope": {
+                "patient_id": "PAT-SYN-002",
+                "care_team_id": "CT-NEURO-1",
+            },
+            "consent_active": True,
+            "is_synthetic": True,
+        },
         # 3 Doctors (different specialties)
         {
             "user_id": "USR-DOC-CARDIO-001",

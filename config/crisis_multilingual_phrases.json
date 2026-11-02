@@ -1,0 +1,153 @@
+{
+  "notice": "COMMUNITY-REVIEWABLE, INCOMPLETE: MULTILINGUAL CRISIS PHRASE LEXICON FOR DEFENSE-IN-DEPTH FILTERING",
+  "languages": ["hindi", "marathi", "hinglish"],
+  "disclaimer": "This lexicon is a heuristic academic safety filter and is explicitly non-exhaustive. It does not replace professional clinical screening or human oversight.",
+  "phrases": [
+    {
+      "language": "hindi",
+      "phrase": "मुझे अपनी जान लेनी है",
+      "transliteration": "mujhe apni jaan leni hai",
+      "meaning": "I want to take my own life",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hindi",
+      "phrase": "मैं अब जीना नहीं चाहता",
+      "transliteration": "main ab jeena nahi chahta",
+      "meaning": "I don't want to live anymore (male)",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hindi",
+      "phrase": "मैं अब जीना नहीं चाहती",
+      "transliteration": "main ab jeena nahi chahti",
+      "meaning": "I don't want to live anymore (female)",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hindi",
+      "phrase": "आत्महत्या करना चाहता हूँ",
+      "transliteration": "aatmhatya karna chahta hoon",
+      "meaning": "I want to commit suicide",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "मला आत्महत्या करायची आहे",
+      "transliteration": "mala aatmahatya karaychi aahe",
+      "meaning": "I want to commit suicide",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "मला जगायची इच्छा नाही",
+      "transliteration": "mala jagaychi iccha nahi",
+      "meaning": "I have no desire to live",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "माझे आयुष्य संपवायचे आहे",
+      "transliteration": "maaze aayushya sampavayche aahe",
+      "meaning": "I want to end my life",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "मला मरण हवे आहे",
+      "transliteration": "mala maran have aahe",
+      "meaning": "I want death",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "khatam karna chahta hu sab",
+      "meaning": "I want to end everything",
+      "intent": "crisis_indirect"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "marne ka man kar raha hai",
+      "meaning": "I feel like dying",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "life end karne ka soch raha hu",
+      "meaning": "thinking about ending life",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "mujhe suicide karna hai",
+      "meaning": "I want to commit suicide",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "mujhe jeena nahi hai",
+      "meaning": "I don't want to live",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "main khudkushi karna chahta hoon",
+      "meaning": "I want to commit suicide",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "apni jaan lena chahta hoon",
+      "meaning": "I want to take my own life",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "mala jagaaycha nahi aahe",
+      "meaning": "I don't want to live",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "aatamhatya karaychi aahe",
+      "meaning": "I want to commit suicide",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "जीव संपवायचा आहे",
+      "meaning": "I want to end my life",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "आत्महत्या करायची आहे",
+      "meaning": "I want to commit suicide",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "mujhe mar jana hai",
+      "meaning": "I have to die",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "marathi",
+      "phrase": "जीवन संपवण्याचा विचार",
+      "meaning": "thoughts of ending life",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "mujhe zinda nahi rehna",
+      "meaning": "I don't want to remain alive",
+      "intent": "crisis_direct"
+    },
+    {
+      "language": "hinglish",
+      "phrase": "khud ko khatam karna hai",
+      "meaning": "I want to end myself",
+      "intent": "crisis_direct"
+    }
+  ]
+}

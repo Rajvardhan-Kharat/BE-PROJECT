@@ -143,6 +143,28 @@ async def create_indexes():
         IndexModel([("patient_id", ASCENDING), ("read", ASCENDING)], name="idx_notif_patient_read"),
     ])
 
+    logger.info("Creating indexes for Aria mental health companion collections...")
+    await db.aria_sessions.create_indexes([
+        IndexModel([("session_ref", ASCENDING)], unique=True, name="idx_aria_sessions_ref_unique"),
+        IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_aria_sessions_patient_status"),
+    ])
+    await db.aria_messages.create_indexes([
+        IndexModel([("message_id", ASCENDING)], unique=True, name="idx_aria_messages_id_unique"),
+        IndexModel([("session_ref", ASCENDING), ("created_at", ASCENDING)], name="idx_aria_messages_session_created"),
+        IndexModel([("patient_id", ASCENDING)], name="idx_aria_messages_patient"),
+    ])
+    await db.aria_notice_acknowledgments.create_indexes([
+        IndexModel([("patient_id", ASCENDING)], unique=True, name="idx_aria_notice_patient_unique"),
+    ])
+    await db.aria_shared_summaries.create_indexes([
+        IndexModel([("summary_id", ASCENDING)], unique=True, name="idx_aria_shared_summaries_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("recipient_id", ASCENDING), ("status", ASCENDING)], name="idx_aria_shared_pat_recip_status"),
+    ])
+    await db.aria_sharing_authorizations.create_indexes([
+        IndexModel([("auth_id", ASCENDING)], unique=True, name="idx_aria_sharing_auth_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("recipient_id", ASCENDING), ("status", ASCENDING)], name="idx_aria_auth_pat_recip_status"),
+    ])
+
     client.close()
     logger.info("All MongoDB indexes created successfully.")
 

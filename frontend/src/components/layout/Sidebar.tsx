@@ -16,6 +16,7 @@ import {
   Cpu,
   ShieldCheck,
   Lock,
+  HeartHandshake,
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useAuth } from '../../context/AuthContext'
@@ -98,6 +99,13 @@ export const Sidebar: React.FC = () => {
       label: 'Patient access log',
       icon: ScrollText,
       roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'aria-companion',
+      path: '/aria',
+      label: 'Aria Companion',
+      icon: HeartHandshake,
+      roles: ['patient'] as UserRole[],
     },
     {
       id: 'break-glass-admin',

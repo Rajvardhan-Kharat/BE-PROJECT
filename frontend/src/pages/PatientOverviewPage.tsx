@@ -25,8 +25,10 @@ import {
   HeartPulse,
   ShieldAlert,
   ScrollText,
+  HeartHandshake,
 } from 'lucide-react'
 import { BreakGlassRequestModal } from '../components/break_glass/BreakGlassRequestModal'
+import type { AriaSharedSummary } from '../types/aria'
 
 export const PatientOverviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -77,6 +79,21 @@ export const PatientOverviewPage: React.FC = () => {
   })
 
   const safePendingRecords = Array.isArray(pendingRecords) ? pendingRecords : []
+
+  // 4. Query Patient-Shared Aria Summary (Clinician View - visible only if active share exists)
+  const { data: ariaSharedSummary } = useQuery<AriaSharedSummary | null>({
+    queryKey: ['aria_shared_summary', id],
+    queryFn: async () => {
+      try {
+        const res = await api.get<AriaSharedSummary>(`/aria/shares/clinician/patient/${id}`)
+        return res
+      } catch {
+        return null
+      }
+    },
+    enabled: !!id,
+    retry: false,
+  })
 
   if (isOverviewLoading) {
     return (
@@ -515,6 +532,36 @@ export const PatientOverviewPage: React.FC = () => {
             </div>
           )}
         </section>
+
+        {/* 3. Patient-Shared Aria Summary (Visible ONLY if active share exists) */}
+        {ariaSharedSummary && ariaSharedSummary.status === 'active' && (
+          <section className="space-y-3 p-4 bg-teal-50/40 border border-teal-200 rounded">
+            <div className="flex items-center justify-between border-b border-teal-200/60 pb-2">
+              <div className="flex items-center gap-2">
+                <HeartHandshake className="w-4 h-4 text-teal-700" />
+                <h3 className="text-xs font-semibold text-teal-900 uppercase tracking-wider">
+                  Patient-Shared Aria Summary
+                </h3>
+              </div>
+              <span className="text-2xs font-mono font-medium px-1.5 py-0.2 rounded bg-teal-100 text-teal-900 border border-teal-300">
+                Patient Approved Snapshot
+              </span>
+            </div>
+
+            <div className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded p-2.5">
+              <strong>Notice:</strong> Self-reported companion summary, approved by patient. Not a clinical assessment.
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded p-3 text-xs text-slate-800 whitespace-pre-wrap font-sans leading-relaxed">
+              {ariaSharedSummary.approved_text}
+            </div>
+
+            <div className="flex items-center justify-between text-2xs text-slate-500 pt-1">
+              <span>Shared snapshot ID: <span className="font-mono">{ariaSharedSummary.summary_id}</span></span>
+              <span>Approved by patient on {new Date(ariaSharedSummary.created_at).toLocaleString()}</span>
+            </div>
+          </section>
+        )}
       </div>
 
       {showBreakGlassModal && patient && (

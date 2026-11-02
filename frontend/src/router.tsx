@@ -17,6 +17,8 @@ import { ConsentSettingsPage } from './pages/ConsentSettingsPage'
 import { PatientAccessLogPage } from './pages/PatientAccessLogPage'
 import { BreakGlassEmergencyViewPage } from './pages/BreakGlassEmergencyViewPage'
 import { AdminBreakGlassReviewPage } from './pages/AdminBreakGlassReviewPage'
+import { AriaChatPage } from './pages/AriaChatPage'
+import { AriaSharingPage } from './pages/AriaSharingPage'
 import { DevUiPage } from './pages/DevUiPage'
 import { EmptyState } from './components/ui/EmptyState'
 import { CheckSquare, ScrollText } from 'lucide-react'
@@ -81,6 +83,14 @@ export const router = createBrowserRouter([
       {
         path: 'access-log',
         element: <PatientAccessLogPage />,
+      },
+      {
+        path: 'aria',
+        element: <AriaChatPage />,
+      },
+      {
+        path: 'aria/shares',
+        element: <AriaSharingPage />,
       },
       {
         path: 'patients/:id/break-glass-view',

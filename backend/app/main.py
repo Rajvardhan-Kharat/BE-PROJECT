@@ -13,6 +13,7 @@ from backend.app.api.v1.consent import router as consent_router
 from backend.app.api.v1.documents import router as documents_router
 from backend.app.api.v1.emergency import router as emergency_router
 from backend.app.api.v1.agent_runs import router as agent_runs_router
+from backend.app.api.v1.aria import router as aria_router
 from backend.app.api.v1.health import router as health_router
 from backend.app.api.v1.patients import router as patients_router
 from backend.app.api.v1.protected_demo import router as protected_router
@@ -130,6 +131,7 @@ app.include_router(emergency_router, prefix=api_v1_str, tags=["Emergency Clinica
 app.include_router(agent_runs_router, prefix=api_v1_str, tags=["Agent Execution Logs"])
 app.include_router(audit_router, prefix=api_v1_str, tags=["Audit Trail"])
 app.include_router(protected_router, prefix=api_v1_str, tags=["RBAC Protected"])
+app.include_router(aria_router, prefix=api_v1_str, tags=["Aria Mental Health Companion"])
 
 
 @app.get("/")

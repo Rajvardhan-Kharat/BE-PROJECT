@@ -25,7 +25,13 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
     ]
 
-    # External Aria Service Adapter
+    # Aria Mental-Health Companion Adapter Configuration
+    ARIA_MODE: Literal["mock", "http"] = "mock"
+    ARIA_BASE_URL: str = "http://localhost:8001"
+    ARIA_API_KEY: str | None = None
+    ARIA_TIMEOUT_SECONDS: float = 10.0
+    ARIA_PROVIDER_LABEL: str = "Aria Mental-Health Companion (Mock Prototype)"
+    ARIA_HMAC_SALT: str = "vericare-aria-pseudonym-salt-synthetic-key-32"
     ARIA_SERVICE_URL: str = "http://localhost:8001"
 
     # Uploads & Extraction Storage

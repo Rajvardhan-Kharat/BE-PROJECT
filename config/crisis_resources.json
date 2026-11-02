@@ -1,0 +1,37 @@
+{
+  "notice": "DEMONSTRATION CRISIS GUIDANCE RESOURCE MAP - PLACEHOLDER ENTRIES MARKED FOR CLINICAL VERIFICATION BEFORE PRODUCTION USE",
+  "disclaimer": "VeriCare AI is an academic clinical verification platform and not an emergency service. In a medical or psychiatric crisis, immediately contact local professional emergency responders.",
+  "status": "VERIFY BEFORE USE",
+  "default_compassionate_response": "I hear how much pain you are experiencing right now, and I want to make sure you have direct human support. Because I am an AI companion and cannot provide emergency medical care, please reach out right now to one of the trusted crisis resources below. You do not have to carry this alone.",
+  "resources": [
+    {
+      "name": "National Crisis & Suicide Prevention Lifeline (US)",
+      "dial": "988",
+      "text": "Text HOME to 741741",
+      "availability": "24/7, free, confidential",
+      "verification_status": "VERIFY BEFORE USE",
+      "notes": "Placeholder accredited crisis service"
+    },
+    {
+      "name": "KIRAN Mental Health Helpline (India)",
+      "dial": "1800-599-0019",
+      "availability": "24/7, toll-free, multi-lingual",
+      "verification_status": "VERIFY BEFORE USE",
+      "notes": "Government of India Ministry of Social Justice"
+    },
+    {
+      "name": "Tele-MANAS National Tele-Mental Health Programme (India)",
+      "dial": "14416",
+      "availability": "24/7, toll-free, comprehensive mental health support",
+      "verification_status": "VERIFY BEFORE USE",
+      "notes": "National tele-mental health assistance"
+    },
+    {
+      "name": "International Crisis Directory",
+      "url": "https://findahelpline.com/",
+      "availability": "Global searchable directory",
+      "verification_status": "VERIFY BEFORE USE",
+      "notes": "Independent directory across 130+ nations"
+    }
+  ]
+}
