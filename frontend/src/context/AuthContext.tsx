@@ -108,6 +108,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Strict requirement: cache cleared on role change
     resetQueryClientCache()
     setLastDeniedError(null)
+
+    // In background, upgrade to official signed JWT token if backend is reachable
+    api
+      .post<{ access_token: string }>('/auth/login', {
+        email: account.email,
+        password: 'synthetic-dev-password',
+      })
+      .then((res) => {
+        if (res && res.access_token) {
+          api.setToken(res.access_token)
+          const upgradedUser = { ...newUser, token: res.access_token }
+          setUser(upgradedUser)
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(upgradedUser))
+          } catch {
+            // Ignore
+          }
+        }
+      })
+      .catch(() => {
+        // Fallback to dev token is already active and handled by rbac
+      })
   }, [])
 
   const switchRole = useCallback((newRole: UserRole) => {

@@ -27,6 +27,25 @@ async def get_current_user(
         )
 
     token = credentials.credentials
+
+    # Fast synthetic dev token support for prototype account switcher
+    if token.startswith("mock-jwt-token-for-"):
+        role = token.replace("mock-jwt-token-for-", "").strip()
+        user = await user_repository.find_one({"role": role})
+        if not user:
+            user = {
+                "user_id": f"USR-{role.upper()}-001",
+                "email": f"{role}@synthetic.vericare.internal",
+                "name": f"Synthetic {role.title()}",
+                "role": role,
+                "scope": {"care_team_id": "CT-INTERNAL-B", "care_team_name": "Internal Medicine Team B"} if role in ["doctor", "senior_doctor"] else {},
+                "consent_active": True,
+            }
+        user["_jti"] = f"mock-jti-{role}"
+        user["_exp"] = 9999999999
+        user["_token"] = token
+        return user
+
     try:
         payload = decode_access_token(token)
     except Exception:

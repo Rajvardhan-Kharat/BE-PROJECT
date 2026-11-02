@@ -23,6 +23,7 @@ from backend.app.api.v1.verification import router as verification_router
 from backend.app.api.v1.followups import router as followups_router
 from backend.app.api.v1.collaboration import router as collaboration_router
 from backend.app.api.v1.corrections_metrics import router as corrections_metrics_router
+from backend.app.api.v1.dashboard import router as dashboard_router
 from backend.app.core.config import settings
 from backend.app.core.database import close_mongo_connection, connect_to_mongo
 
@@ -149,6 +150,7 @@ app.include_router(aria_router, prefix=api_v1_str, tags=["Aria Mental Health Com
 app.include_router(followups_router, prefix=api_v1_str, tags=["Follow-up & Medication-Course Tracking"])
 app.include_router(collaboration_router, prefix=api_v1_str, tags=["Second Memory & Care-Team Collaboration"])
 app.include_router(corrections_metrics_router, prefix=api_v1_str, tags=["Verification Correction Metrics"])
+app.include_router(dashboard_router, prefix=api_v1_str, tags=["Dashboard"])
 
 
 @app.get("/")

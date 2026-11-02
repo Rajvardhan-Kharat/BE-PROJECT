@@ -189,3 +189,33 @@ async def test_consistent_json_error_shape_and_no_stack_traces(client: AsyncClie
     assert "message" in body["error"]
     assert "traceback" not in body["error"]
     assert "stack" not in body["error"]
+
+
+@pytest.mark.asyncio
+async def test_dashboard_endpoint_for_roles(client: AsyncClient):
+    """Verifies that /api/v1/dashboard/{role} returns valid records for each role."""
+    for role in ["senior_doctor", "doctor", "patient", "hospital_admin", "system_admin"]:
+        res = await client.get(f"/api/v1/dashboard/{role}")
+        assert res.status_code == 200
+        data = res.json()
+        assert isinstance(data, list)
+        if len(data) > 0:
+            item = data[0]
+            assert "id" in item
+            assert "title" in item
+            assert "status" in item
+            assert "source" in item
+            assert "createdAt" in item
+
+
+@pytest.mark.asyncio
+async def test_mock_dev_token_authentication(client: AsyncClient):
+    """Verifies that synthetic dev tokens (mock-jwt-token-for-{role}) authenticate cleanly."""
+    res = await client.get(
+        "/api/v1/notifications",
+        headers={"Authorization": "Bearer mock-jwt-token-for-senior_doctor"},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert "notifications" in data
+    assert "unread_count" in data

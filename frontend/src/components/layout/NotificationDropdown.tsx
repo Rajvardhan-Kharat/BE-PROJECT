@@ -11,12 +11,14 @@ export const NotificationDropdown: React.FC = () => {
   const queryClient = useQueryClient()
 
   // Query notifications
+  const token = api.getToken()
   const { data } = useQuery<{ notifications: InAppNotification[]; unread_count: number }>({
-    queryKey: ['my-notifications'],
+    queryKey: ['my-notifications', token],
     queryFn: async () => {
       const res = await api.get<any>('/notifications')
       return res?.data || res
     },
+    enabled: !!token,
     refetchInterval: 15000,
   })
 
