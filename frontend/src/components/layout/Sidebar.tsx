@@ -9,6 +9,8 @@ import {
   Layers,
   ChevronDown,
   ShieldAlert,
+  UploadCloud,
+  FileCheck2,
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useAuth } from '../../context/AuthContext'
@@ -35,6 +37,20 @@ export const Sidebar: React.FC = () => {
       label: 'Patient Directory',
       icon: Users,
       roles: ['patient', 'doctor', 'senior_doctor', 'hospital_admin', 'system_admin'] as UserRole[],
+    },
+    {
+      id: 'upload',
+      path: '/upload',
+      label: 'Document Upload',
+      icon: UploadCloud,
+      roles: ['doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'extraction-review',
+      path: '/documents/DOC-SYN-84920-01/review',
+      label: 'Extraction Review',
+      icon: FileCheck2,
+      roles: ['doctor', 'senior_doctor', 'system_admin'] as UserRole[],
     },
     {
       id: 'verification',
@@ -105,7 +121,8 @@ export const Sidebar: React.FC = () => {
             const isActive =
               location.pathname === item.path ||
               (item.path === '/dashboard' && location.pathname === '/') ||
-              (item.path === '/patients' && location.pathname.startsWith('/patients'))
+              (item.path === '/patients' && location.pathname.startsWith('/patients')) ||
+              (item.id === 'extraction-review' && location.pathname.startsWith('/documents/'))
             return (
               <button
                 key={item.id}

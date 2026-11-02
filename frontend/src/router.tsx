@@ -5,6 +5,8 @@ import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { PatientDirectoryPage } from './pages/PatientDirectoryPage'
 import { PatientOverviewPage } from './pages/PatientOverviewPage'
+import { DocumentUploadPage } from './pages/DocumentUploadPage'
+import { ExtractionReviewPage } from './pages/ExtractionReviewPage'
 import { DevUiPage } from './pages/DevUiPage'
 import { EmptyState } from './components/ui/EmptyState'
 import { FileSearch, CheckSquare, ScrollText } from 'lucide-react'
@@ -37,6 +39,14 @@ export const router = createBrowserRouter([
       {
         path: 'patients/:id',
         element: <PatientOverviewPage />,
+      },
+      {
+        path: 'upload',
+        element: <DocumentUploadPage />,
+      },
+      {
+        path: 'documents/:id/review',
+        element: <ExtractionReviewPage />,
       },
       {
         path: 'verification',

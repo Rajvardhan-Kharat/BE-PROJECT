@@ -51,6 +51,63 @@ async def upload_document(
     return result
 
 
+@router.get("/documents/{document_id}")
+async def get_document(
+    document_id: str,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+) -> Dict[str, Any]:
+    """Returns single document extraction with text and fields."""
+    doc = await document_repository.get_by_document_id(document_id)
+    if not doc:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Document not found")
+    client_ip = request.client.host if request.client else None
+    await patient_service.check_patient_access(
+        user=current_user,
+        patient_id=doc["patient_id"],
+        resource_path=str(request.url.path),
+        client_ip=client_ip,
+    )
+    return doc
+
+
+@router.post("/documents/{document_id}/corrections")
+async def add_human_correction(
+    document_id: str,
+    correction: Dict[str, Any],
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+) -> Dict[str, Any]:
+    """Records reviewer human correction (original, corrected, reason)."""
+    from datetime import datetime, timezone
+    from fastapi import HTTPException
+    doc = await document_repository.get_by_document_id(document_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    client_ip = request.client.host if request.client else None
+    await patient_service.check_patient_access(
+        user=current_user,
+        patient_id=doc["patient_id"],
+        resource_path=str(request.url.path),
+        client_ip=client_ip,
+    )
+    corrections = doc.get("human_corrections", [])
+    corrections.append({
+        "field_name": correction.get("field_name"),
+        "original_value": correction.get("original_value"),
+        "corrected_value": correction.get("corrected_value"),
+        "reason": correction.get("reason"),
+        "corrected_by": current_user.get("user_id"),
+        "corrected_at": datetime.now(timezone.utc).isoformat(),
+    })
+    await document_repository.update_one(
+        {"document_id": document_id},
+        {"human_corrections": corrections}
+    )
+    return {"status": "success", "corrections_count": len(corrections)}
+
+
 @router.get("/documents/patient/{patient_id}")
 async def list_patient_documents(
     patient_id: str,
