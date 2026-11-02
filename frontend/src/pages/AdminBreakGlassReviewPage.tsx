@@ -117,7 +117,7 @@ export const AdminBreakGlassReviewPage: React.FC = () => {
             onClick={() => setFilterStatus(tab.id)}
             className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
               filterStatus === tab.id
-                ? 'bg-blue-50 text-blue-700 font-semibold'
+                ? 'bg-teal-50 text-teal-800 border border-teal-200 font-semibold'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
@@ -127,7 +127,7 @@ export const AdminBreakGlassReviewPage: React.FC = () => {
       </div>
 
       {/* Sessions Table */}
-      <div className="bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 shadow-xs rounded-md overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-sm text-gray-500">Loading break-glass audit logs...</div>
         ) : error ? (
@@ -165,7 +165,7 @@ export const AdminBreakGlassReviewPage: React.FC = () => {
                       <span className="font-mono text-gray-800 font-medium">{session.doctor_id}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="font-mono text-blue-600 font-medium">{session.patient_id}</span>
+                      <span className="font-mono text-slate-800 font-medium">{session.patient_id}</span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-gray-100 text-gray-800">
@@ -187,7 +187,7 @@ export const AdminBreakGlassReviewPage: React.FC = () => {
                             setReviewDetermination('justified');
                             setErrorMsg(null);
                           }}
-                          className="px-2.5 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded shadow-sm transition-colors"
+                          className="px-2.5 py-1 text-xs font-medium text-white bg-teal-700 hover:bg-teal-800 rounded shadow-xs transition-colors"
                         >
                           Audit Review
                         </button>
@@ -215,8 +215,8 @@ export const AdminBreakGlassReviewPage: React.FC = () => {
 
       {/* Review Modal Dialog */}
       {selectedSession && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-lg shadow-xl border border-gray-200 max-w-lg w-full p-6 text-xs sm:text-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+          <div className="bg-white rounded-md shadow-xl border border-gray-200 max-w-lg w-full p-6 text-xs sm:text-sm">
             <div className="flex items-center justify-between pb-3 border-b border-gray-200">
               <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-red-600" />
@@ -314,7 +314,7 @@ export const AdminBreakGlassReviewPage: React.FC = () => {
                   onChange={(e) => setReviewNotes(e.target.value)}
                   placeholder="Record formal administrative findings, policy reference, or follow-up interview status..."
                   rows={3}
-                  className="w-full text-xs p-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full text-xs p-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-teal-700 focus:border-teal-700 outline-none"
                   required
                 />
               </div>
@@ -336,7 +336,7 @@ export const AdminBreakGlassReviewPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={reviewMutation.isPending}
-                  className="px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded shadow-sm disabled:opacity-50"
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 rounded shadow-xs disabled:opacity-50"
                 >
                   {reviewMutation.isPending ? 'Submitting...' : 'Save Audit Determination'}
                 </button>

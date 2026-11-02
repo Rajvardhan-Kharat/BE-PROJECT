@@ -24,7 +24,12 @@ import { cn } from '../../utils/cn'
 import { useAuth } from '../../context/AuthContext'
 import type { UserRole } from '../../types/auth'
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  mobileOpen?: boolean
+  onCloseMobile?: () => void
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) => {
   const { user, switchRole } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -179,46 +184,64 @@ export const Sidebar: React.FC = () => {
   const visibleNavItems = navItems.filter((item) => item.roles.includes(currentRole))
 
   return (
-    <aside className="w-56 bg-slate-100 border-r border-slate-200 flex flex-col justify-between shrink-0 select-none">
-      {/* Brand & Organization */}
-      <div>
-        <div className="h-11 px-3 border-b border-slate-200 flex items-center justify-between bg-white">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-teal-700 flex items-center justify-center text-white text-xs font-bold">
-              V
+    <>
+      {/* Mobile Backdrop */}
+      {mobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+        />
+      )}
+
+      <aside
+        className={cn(
+          'w-56 bg-slate-100 border-r border-slate-200 flex flex-col justify-between shrink-0 select-none z-50 transition-transform duration-150',
+          'fixed inset-y-0 left-0 md:static md:translate-x-0',
+          mobileOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full md:translate-x-0'
+        )}
+      >
+        {/* Brand & Organization */}
+        <div>
+          <div className="h-11 px-3 border-b border-slate-200 flex items-center justify-between bg-white">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded bg-teal-700 flex items-center justify-center text-white text-xs font-bold">
+                V
+              </div>
+              <span className="font-semibold text-slate-900 text-base tracking-tight">
+                VeriCare AI
+              </span>
             </div>
-            <span className="font-semibold text-slate-900 text-base tracking-tight">
-              VeriCare AI
+            <span className="text-2xs font-mono px-1 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-300">
+              v0.1
             </span>
           </div>
-          <span className="text-2xs font-mono px-1 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-300">
-            v0.1
-          </span>
-        </div>
 
-        {/* Navigation list */}
-        <div className="p-2 space-y-0.5">
-          <div className="px-2 py-1 text-2xs font-semibold text-slate-500 uppercase tracking-wider">
-            Workspace Nav
-          </div>
-          {visibleNavItems.map((item) => {
-            const Icon = item.icon
-            const isActive =
-              location.pathname === item.path ||
-              (item.path === '/dashboard' && location.pathname === '/') ||
-              (item.path === '/patients' && location.pathname.startsWith('/patients')) ||
-              (item.id === 'extraction-review' && location.pathname.startsWith('/documents/'))
-            return (
-              <button
-                key={item.id}
-                onClick={() => navigate(item.path)}
-                className={cn(
-                  'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-base transition-colors text-left',
-                  isActive
-                    ? 'bg-teal-700 text-white font-medium shadow-sm'
-                    : 'text-slate-700 hover:bg-slate-200/70 hover:text-slate-900'
-                )}
-              >
+          {/* Navigation list */}
+          <div className="p-2 space-y-0.5">
+            <div className="px-2 py-1 text-2xs font-semibold text-slate-500 uppercase tracking-wider">
+              Workspace Nav
+            </div>
+            {visibleNavItems.map((item) => {
+              const Icon = item.icon
+              const isActive =
+                location.pathname === item.path ||
+                (item.path === '/dashboard' && location.pathname === '/') ||
+                (item.path === '/patients' && location.pathname.startsWith('/patients')) ||
+                (item.id === 'extraction-review' && location.pathname.startsWith('/documents/'))
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    navigate(item.path)
+                    onCloseMobile?.()
+                  }}
+                  className={cn(
+                    'w-full flex items-center justify-between px-2.5 py-1.5 rounded text-base transition-colors text-left',
+                    isActive
+                      ? 'bg-teal-700 text-white font-medium shadow-sm'
+                      : 'text-slate-700 hover:bg-slate-200/70 hover:text-slate-900'
+                  )}
+                >
                 <div className="flex items-center gap-2 min-w-0">
                   <Icon
                     className={cn(
@@ -265,5 +288,6 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
     </aside>
+    </>
   )
 }

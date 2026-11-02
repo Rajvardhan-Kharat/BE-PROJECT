@@ -192,9 +192,9 @@ export const AriaSharingPage: React.FC = () => {
       )}
 
       {/* Step 1 & 2: Select Recipient & Draft Summary */}
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-xs space-y-4">
+      <div className="rounded-md border border-slate-200 bg-white p-5 shadow-xs space-y-4">
         <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-          <FileText className="h-5 w-5 text-blue-600" />
+          <FileText className="h-5 w-5 text-teal-700" />
           <h2 className="text-sm font-semibold text-slate-900">
             Step 1: Choose Recipient Clinician & Generate Draft
           </h2>
@@ -208,7 +208,7 @@ export const AriaSharingPage: React.FC = () => {
             <select
               value={selectedClinicianId}
               onChange={(e) => setSelectedClinicianId(e.target.value)}
-              className="w-full rounded-md border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-md border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-teal-700 focus:outline-none focus:ring-1 focus:ring-teal-700"
             >
               {CARE_TEAM_OPTIONS.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -225,7 +225,7 @@ export const AriaSharingPage: React.FC = () => {
             <select
               value={selectedSessionRef}
               onChange={(e) => setSelectedSessionRef(e.target.value)}
-              className="w-full rounded-md border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-md border border-slate-300 bg-white p-2 text-xs text-slate-800 focus:border-teal-700 focus:outline-none focus:ring-1 focus:ring-teal-700"
             >
               {sessions.map((s) => (
                 <option key={s.session_ref} value={s.session_ref}>
@@ -247,7 +247,7 @@ export const AriaSharingPage: React.FC = () => {
             {isDrafting ? (
               <RefreshCw className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+              <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             )}
             Draft Summary for Clinician
           </Button>
@@ -256,15 +256,15 @@ export const AriaSharingPage: React.FC = () => {
 
       {/* Step 3: Full Preview & Edit */}
       {draftText && (
-        <div className="rounded-lg border-2 border-blue-200 bg-blue-50/30 p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-blue-100 pb-3">
+        <div className="rounded-md border border-teal-200 bg-teal-50/20 p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-teal-100 pb-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-blue-700" />
+              <ShieldCheck className="h-5 w-5 text-teal-700" />
               <h2 className="text-sm font-semibold text-slate-900">
                 Step 2: Preview & Edit Your Summary
               </h2>
             </div>
-            <span className="rounded bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-800">
+            <span className="rounded bg-teal-100 px-2 py-0.5 text-[10px] font-semibold text-teal-800">
               Not yet shared
             </span>
           </div>
@@ -287,7 +287,7 @@ export const AriaSharingPage: React.FC = () => {
               value={draftText}
               onChange={(e) => setDraftText(e.target.value)}
               rows={8}
-              className="w-full rounded-md border border-slate-300 bg-white p-3 text-xs text-slate-800 font-sans leading-relaxed focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-slate-300 bg-white p-3 text-xs text-slate-800 font-sans leading-relaxed focus:border-teal-700 focus:outline-none focus:ring-1 focus:ring-teal-700"
             />
           </div>
 
@@ -325,7 +325,7 @@ export const AriaSharingPage: React.FC = () => {
       )}
 
       {/* Active Shares Section */}
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-xs space-y-4">
+      <div className="rounded-md border border-slate-200 bg-white p-5 shadow-xs space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <UserCheck className="h-5 w-5 text-emerald-600" />

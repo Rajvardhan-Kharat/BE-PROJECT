@@ -118,7 +118,7 @@ export const FollowUpTrackerPage: React.FC = () => {
     switch (status) {
       case 'upcoming':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-2xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-2xs font-medium bg-slate-100 text-slate-800 border border-slate-300">
             <Clock className="w-3 h-3" />
             Upcoming
           </span>
@@ -161,11 +161,11 @@ export const FollowUpTrackerPage: React.FC = () => {
       case 'medication_course':
         return <Pill className="w-3.5 h-3.5 text-teal-700" />
       case 'appointment':
-        return <Calendar className="w-3.5 h-3.5 text-blue-600" />
+        return <Calendar className="w-3.5 h-3.5 text-slate-700" />
       case 'lab_test':
-        return <FlaskConical className="w-3.5 h-3.5 text-purple-600" />
+        return <FlaskConical className="w-3.5 h-3.5 text-amber-700" />
       case 'imaging':
-        return <Scan className="w-3.5 h-3.5 text-slate-600" />
+        return <Scan className="w-3.5 h-3.5 text-slate-700" />
     }
   }
 
@@ -220,8 +220,8 @@ export const FollowUpTrackerPage: React.FC = () => {
           <div className="text-xl font-bold font-mono text-slate-900 mt-1">{totalTracked}</div>
         </div>
         <div className="p-3 bg-white border border-slate-200 rounded">
-          <div className="text-2xs font-medium text-blue-600 uppercase tracking-wider">Upcoming</div>
-          <div className="text-xl font-bold font-mono text-blue-700 mt-1">{upcomingCount}</div>
+          <div className="text-2xs font-medium text-slate-600 uppercase tracking-wider">Upcoming</div>
+          <div className="text-xl font-bold font-mono text-slate-800 mt-1">{upcomingCount}</div>
         </div>
         <div className="p-3 bg-white border border-rose-200 rounded bg-rose-50/30">
           <div className="text-2xs font-medium text-rose-600 uppercase tracking-wider">Overdue</div>

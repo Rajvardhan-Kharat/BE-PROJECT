@@ -27,12 +27,12 @@ export const AriaNoticeModal: React.FC<AriaNoticeModalProps> = ({ notice, onAckn
       role="dialog"
       aria-modal="true"
       aria-labelledby="aria-notice-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     >
-      <div className="w-full max-w-xl rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
+      <div className="w-full max-w-xl rounded-md border border-slate-200 bg-white p-6 shadow-xl">
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-          <div className="rounded-full bg-blue-50 p-2 text-blue-700">
-            <ShieldAlert className="h-6 w-6" />
+          <div className="rounded p-2 bg-teal-50 text-teal-800 border border-teal-200">
+            <ShieldAlert className="h-5 w-5" />
           </div>
           <div>
             <h2 id="aria-notice-title" className="text-lg font-semibold text-slate-900">
@@ -99,7 +99,7 @@ export const AriaNoticeModal: React.FC<AriaNoticeModalProps> = ({ notice, onAckn
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-teal-700 focus:ring-teal-700"
             />
             <span className="text-xs text-slate-800">
               I understand that Aria is a non-clinical companion, is not monitored in real time, and that I should contact emergency services if in crisis.

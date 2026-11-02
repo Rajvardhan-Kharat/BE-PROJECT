@@ -1,5 +1,5 @@
 import React from 'react'
-import { AlertCircle, User, ShieldCheck, LogOut } from 'lucide-react'
+import { AlertCircle, User, ShieldCheck, LogOut, Menu } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { NotificationDropdown } from './NotificationDropdown'
 
@@ -16,6 +16,7 @@ export interface PatientContext {
 
 interface TopBarProps {
   patient?: PatientContext
+  onToggleMobileMenu?: () => void
 }
 
 const defaultPatient: PatientContext = {
@@ -29,13 +30,22 @@ const defaultPatient: PatientContext = {
   consentActive: true,
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ patient = defaultPatient }) => {
+export const TopBar: React.FC<TopBarProps> = ({ patient = defaultPatient, onToggleMobileMenu }) => {
   const { user, logout } = useAuth()
 
   return (
-    <header className="h-11 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0 select-none">
-      {/* Patient Clinical Context */}
-      <div className="flex items-center gap-3 min-w-0">
+    <header className="h-11 bg-white border-b border-slate-200 px-3 sm:px-4 flex items-center justify-between shrink-0 select-none">
+      {/* Mobile Menu Toggle & Patient Clinical Context */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        {onToggleMobileMenu && (
+          <button
+            onClick={onToggleMobileMenu}
+            className="md:hidden p-1 rounded hover:bg-slate-100 text-slate-600 focus:outline-none"
+            title="Toggle Navigation Menu"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+        )}
         <div className="flex items-center gap-1.5 text-slate-800">
           <div className="w-6 h-6 rounded bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
             <User className="w-3.5 h-3.5" />

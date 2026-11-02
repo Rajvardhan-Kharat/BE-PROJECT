@@ -187,7 +187,7 @@ export const AriaChatPage: React.FC = () => {
       {/* Header Bar */}
       <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
         <div className="flex items-center gap-2">
-          <div className="rounded-lg bg-teal-50 p-2 text-teal-700">
+          <div className="rounded-md bg-teal-50 p-2 text-teal-700">
             <HeartHandshake className="h-5 w-5" />
           </div>
           <div>
@@ -261,7 +261,7 @@ export const AriaChatPage: React.FC = () => {
         <div
           role="alert"
           aria-live="assertive"
-          className="mb-3 rounded-lg border-2 border-red-500 bg-red-50 p-4 shadow-sm"
+          className="mb-3 rounded-md border-2 border-red-500 bg-red-50 p-4 shadow-xs"
         >
           <div className="flex items-start gap-3">
             <div className="rounded-full bg-red-100 p-2 text-red-700 shrink-0">
@@ -291,7 +291,7 @@ export const AriaChatPage: React.FC = () => {
                         href={res.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-700 hover:underline mt-1"
+                        className="inline-flex items-center gap-1 text-[11px] font-medium text-teal-700 hover:underline mt-1"
                       >
                         Visit Website <ExternalLink className="h-3 w-3" />
                       </a>
@@ -319,7 +319,7 @@ export const AriaChatPage: React.FC = () => {
       )}
 
       {/* Main Journal Message History Container (Minimal, Calm Design) */}
-      <div className="flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50/50 p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto rounded-md border border-slate-200 bg-slate-50/50 p-4 space-y-4">
         {isLoadingMessages ? (
           <div className="flex h-48 items-center justify-center text-xs text-slate-500">
             <RefreshCw className="h-4 w-4 animate-spin mr-2" />
@@ -355,7 +355,7 @@ export const AriaChatPage: React.FC = () => {
                 </div>
 
                 <div
-                  className={`max-w-2xl rounded-lg px-4 py-3 text-xs leading-relaxed ${
+                  className={`max-w-2xl rounded-md px-4 py-3 text-xs leading-relaxed ${
                     isUser
                       ? 'bg-slate-800 text-white shadow-xs rounded-tr-none'
                       : isCrisis
@@ -408,7 +408,7 @@ export const AriaChatPage: React.FC = () => {
             placeholder="Write your private reflection or share how you are feeling... (Shift+Enter for newline)"
             rows={2}
             disabled={isSending}
-            className="flex-1 resize-none rounded-lg border border-slate-300 bg-white p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="flex-1 resize-none rounded-md border border-slate-300 bg-white p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:border-teal-700 focus:outline-none focus:ring-1 focus:ring-teal-700 disabled:opacity-50"
           />
 
           <Button

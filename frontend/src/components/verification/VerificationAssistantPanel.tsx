@@ -218,7 +218,7 @@ export const VerificationAssistantPanel: React.FC<VerificationAssistantPanelProp
                     </td>
                     <td className="py-1.5 px-3 font-sans">
                       {diff.is_new ? (
-                        <span className="px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-[10px]">
+                        <span className="px-1.5 py-0.5 bg-teal-50 text-teal-800 border border-teal-200 rounded text-[10px]">
                           New
                         </span>
                       ) : diff.is_changed ? (
