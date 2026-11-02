@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, Query, Request
+from backend.app.agents.verification_assistant import verification_assistant_agent
 from backend.app.permissions.rbac import get_current_user
 from backend.app.schemas.verification import (
     RecordComparisonResponse,
@@ -9,6 +10,7 @@ from backend.app.schemas.verification import (
     VerificationDecisionRequest,
     VerificationQueueItem,
 )
+from backend.app.schemas.verification_assistant import VerificationAssistantResponse
 from backend.app.services.verification_service import verification_service
 
 router = APIRouter()
@@ -127,4 +129,29 @@ async def get_record_history(
         record_id=record_id,
         current_user=current_user,
         client_ip=client_ip,
+    )
+
+
+@router.get("/verification/assistant/{version_id}", response_model=VerificationAssistantResponse)
+async def get_verification_assistant_analysis(
+    version_id: str,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Verification Assistant: analyzes a pending proposal, returning missing/uncertain fields,
+    prior conflicts, old vs proposed diff, evidence spans, and an advisory suggestion with LLM reworded prose.
+    """
+    role = current_user.get("role", "")
+    if role not in ["doctor", "senior_doctor", "system_admin"]:
+        from fastapi import HTTPException, status
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verification assistant access restricted to clinical verifiers and physicians.",
+        )
+
+    req_id = request.headers.get("X-Request-ID")
+    return await verification_assistant_agent.analyze_submission(
+        version_id=version_id,
+        request_id=req_id,
     )

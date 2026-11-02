@@ -40,6 +40,15 @@ class BaseLLMProvider(ABC):
         """Attempts to repair malformed JSON given the parse error."""
         pass
 
+    @abstractmethod
+    async def reword_reviewer_summary(
+        self,
+        draft_summary: str,
+        key_points: list,
+    ) -> str:
+        """Rewords deterministic verification findings into professional clinical reviewer prose."""
+        pass
+
 
 class MockLLMProvider(BaseLLMProvider):
     """
@@ -169,6 +178,21 @@ class MockLLMProvider(BaseLLMProvider):
         except Exception:
             return '{"fields": []}'
 
+    async def reword_reviewer_summary(
+        self,
+        draft_summary: str,
+        key_points: list,
+    ) -> str:
+        if self.force_down:
+            raise LLMProviderDownError("LLM Provider is unreachable during summary rewording.")
+
+        points_str = "; ".join(key_points) if key_points else "No material discrepancies identified."
+        return (
+            f"[Aria Verification Synthesis]: {draft_summary.strip()} "
+            f"Key observations: {points_str}. "
+            "Advisory suggestion only; human clinician decides."
+        )
+
 
 class RealLLMProviderStub(BaseLLMProvider):
     """
@@ -258,6 +282,39 @@ class RealLLMProviderStub(BaseLLMProvider):
         except Exception as err:
             logger.error("Failed to repair JSON via external provider: %s", err)
             raise LLMProviderDownError(f"Repair request failed: {str(err)}") from err
+
+    async def reword_reviewer_summary(
+        self,
+        draft_summary: str,
+        key_points: list,
+    ) -> str:
+        if not self.api_key:
+            return f"[Clinical Synthesis]: {draft_summary} Observations: {'; '.join(key_points)}"
+
+        prompt = (
+            "You are a clinical verification assistant. Reword the draft verification findings into concise, professional reviewer prose for the senior doctor. Do NOT invent facts or change suggestions.\n\n"
+            f"Draft:\n{draft_summary}\n\nKey Points:\n" + "\n".join(f"- {p}" for p in key_points)
+        )
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        body = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": "You are a clinical assistant. Output concise clinical prose only."},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.0,
+        }
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                res = await client.post(f"{self.api_url}/chat/completions", headers=headers, json=body)
+                res.raise_for_status()
+                return res.json()["choices"][0]["message"]["content"].strip()
+        except Exception as err:
+            logger.warning("External LLM rewording failed, falling back to deterministic: %s", err)
+            return f"[Clinical Synthesis]: {draft_summary} (Observations: {'; '.join(key_points)})"
 
 
 # Provider singleton / factory

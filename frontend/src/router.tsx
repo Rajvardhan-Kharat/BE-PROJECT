@@ -11,6 +11,8 @@ import { VerificationQueuePage } from './pages/VerificationQueuePage'
 import { RecordComparisonPage } from './pages/RecordComparisonPage'
 import { MedicationSafetyPage } from './pages/MedicationSafetyPage'
 import { TimelineAuditPage } from './pages/TimelineAuditPage'
+import { EmergencySummaryPage } from './pages/EmergencySummaryPage'
+import { AgentExecutionLogsPage } from './pages/AgentExecutionLogsPage'
 import { DevUiPage } from './pages/DevUiPage'
 import { EmptyState } from './components/ui/EmptyState'
 import { CheckSquare, ScrollText } from 'lucide-react'
@@ -53,12 +55,24 @@ export const router = createBrowserRouter([
         element: <TimelineAuditPage />,
       },
       {
+        path: 'patients/:id/emergency-summary',
+        element: <EmergencySummaryPage />,
+      },
+      {
+        path: 'emergency-summary',
+        element: <EmergencySummaryPage />,
+      },
+      {
         path: 'safety',
         element: <MedicationSafetyPage />,
       },
       {
         path: 'timeline',
         element: <TimelineAuditPage />,
+      },
+      {
+        path: 'agent-runs',
+        element: <AgentExecutionLogsPage />,
       },
       {
         path: 'upload',

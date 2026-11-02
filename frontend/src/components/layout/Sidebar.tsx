@@ -12,6 +12,8 @@ import {
   UploadCloud,
   FileCheck2,
   History,
+  HeartPulse,
+  Cpu,
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useAuth } from '../../context/AuthContext'
@@ -73,6 +75,20 @@ export const Sidebar: React.FC = () => {
       label: 'Timeline audit',
       icon: History,
       roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'emergency-summary',
+      path: '/emergency-summary',
+      label: 'Emergency summary',
+      icon: HeartPulse,
+      roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'agent-runs',
+      path: '/agent-runs',
+      label: 'Agent execution logs',
+      icon: Cpu,
+      roles: ['doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
     },
     {
       id: 'worklist',

@@ -35,7 +35,7 @@ class ApiClient {
   private onUnauthorizedCallbacks: Set<UnauthorizedHandler> = new Set()
   private onForbiddenCallbacks: Set<ForbiddenHandler> = new Set()
 
-  constructor(baseUrl = '/api') {
+  constructor(baseUrl = '/api/v1') {
     this.baseUrl = baseUrl
   }
 
@@ -81,9 +81,14 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = endpoint.startsWith('http')
-      ? endpoint
-      : `${this.baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
+    let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+    if (this.baseUrl.endsWith('/api/v1') && cleanEndpoint.startsWith('/api/v1/')) {
+      cleanEndpoint = cleanEndpoint.substring('/api/v1'.length)
+    }
+
+    const url = cleanEndpoint.startsWith('http')
+      ? cleanEndpoint
+      : `${this.baseUrl}${cleanEndpoint}`
 
     const headers = new Headers(options.headers || {})
     headers.set('Content-Type', 'application/json')
@@ -169,4 +174,4 @@ class ApiClient {
   }
 }
 
-export const api = new ApiClient(import.meta.env.VITE_API_BASE_URL || '/api')
+export const api = new ApiClient(import.meta.env.VITE_API_BASE_URL || '/api/v1')

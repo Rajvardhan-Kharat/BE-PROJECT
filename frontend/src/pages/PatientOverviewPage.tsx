@@ -22,6 +22,7 @@ import {
   ArrowRight,
   Pill,
   History,
+  HeartPulse,
 } from 'lucide-react'
 
 export const PatientOverviewPage: React.FC = () => {
@@ -123,6 +124,14 @@ export const PatientOverviewPage: React.FC = () => {
             onClick={() => navigate(`/patients/${patient.patient_id}/timeline`)}
           >
             Timeline Conflict Audit
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<HeartPulse className="w-3.5 h-3.5 text-rose-600" />}
+            onClick={() => navigate(`/patients/${patient.patient_id}/emergency-summary`)}
+          >
+            Emergency Profile
           </Button>
           <Button
             size="sm"

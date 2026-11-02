@@ -21,11 +21,13 @@ import { StatusChip } from '../components/ui/StatusChip'
 import { ExtractionStatusChip } from '../components/ui/ExtractionStatusChip'
 import { VerificationDecisionModal } from '../components/verification/VerificationDecisionModal'
 import { RecordHistoryModal } from '../components/verification/RecordHistoryModal'
+import { VerificationAssistantPanel } from '../components/verification/VerificationAssistantPanel'
 import type {
   DecisionType,
   RecordComparisonResponse,
   FieldDiff,
 } from '../types/verification'
+import type { VerificationAssistantResponse } from '../types/verification_assistant'
 
 export const RecordComparisonPage: React.FC = () => {
   const { versionId } = useParams<{ versionId: string }>()
@@ -51,6 +53,21 @@ export const RecordComparisonPage: React.FC = () => {
     queryFn: async () => {
       if (!versionId) throw new Error('No version ID')
       return await api.get<RecordComparisonResponse>(`/verification/${versionId}`)
+    },
+    enabled: !!versionId,
+  })
+
+  // Query verification assistant advisory report
+  const {
+    data: assistantData,
+    isLoading: isAssistantLoading,
+    isError: isAssistantError,
+    error: assistantError,
+  } = useQuery<VerificationAssistantResponse>({
+    queryKey: ['verification_assistant', versionId],
+    queryFn: async () => {
+      if (!versionId) throw new Error('No version ID')
+      return await api.get<VerificationAssistantResponse>(`/verification/assistant/${versionId}`)
     },
     enabled: !!versionId,
   })
@@ -243,6 +260,14 @@ export const RecordComparisonPage: React.FC = () => {
           {feedbackNotification.message}
         </Banner>
       )}
+
+      {/* Verification Assistant Advisory Panel */}
+      <VerificationAssistantPanel
+        data={assistantData}
+        isLoading={isAssistantLoading}
+        isError={isAssistantError}
+        error={assistantError}
+      />
 
       {/* Two-Column Comparison View: Source beside Extraction & Current vs Proposed */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
