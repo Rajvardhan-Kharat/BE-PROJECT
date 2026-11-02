@@ -1,11 +1,15 @@
+from datetime import datetime
 from typing import Any, Dict, List, Optional
+from uuid import uuid4
 from fastapi import HTTPException, status
+from backend.app.repositories.break_glass_repository import break_glass_repository
 from backend.app.repositories.care_team_repository import care_team_repository
 from backend.app.repositories.encounter_repository import encounter_repository
 from backend.app.repositories.organization_repository import organization_repository
 from backend.app.repositories.patient_repository import patient_repository
 from backend.app.repositories.record_version_repository import record_version_repository
 from backend.app.services.audit_service import audit_service
+from backend.app.services.consent_service import consent_service
 
 
 class PatientService:
@@ -43,14 +47,16 @@ class PatientService:
         patient_id: str,
         resource_path: str = "",
         client_ip: Optional[str] = None,
+        category: str = "*",
+        purpose: str = "treatment",
     ) -> Dict[str, Any]:
         """
         Verifies whether caller has authorized scope to view or operate on patient_id.
         Enforces:
           1. Patient existence check
-          2. Patient consent check
+          2. Patient consent check (subsystem verification on every read)
           3. Patient self-only scope check
-          4. Doctor care-team membership scope check
+          4. Doctor care-team membership check with break-glass override fallback
           5. Hospital admin facility check
         Any scope denial strictly triggers an audit event and raises 403 Forbidden.
         """
@@ -65,7 +71,7 @@ class PatientService:
                 detail=f"Patient record '{patient_id}' not found.",
             )
 
-        # 1. Patient Consent Check
+        # 1. Global Patient Consent Check
         if not patient.get("active_consent", True) and role != "system_admin":
             await audit_service.log_access_denied_403(
                 user_id=user_id,
@@ -100,7 +106,7 @@ class PatientService:
                 )
             return patient
 
-        # 3. Doctor & Senior Doctor Scope: Must belong to patient's care team
+        # 3. Doctor & Senior Doctor Scope: Care team check OR active Break-Glass override
         if role in ["doctor", "senior_doctor"]:
             clinician_id = user_id
             care_team_id = user_scope.get("care_team_id")
@@ -109,7 +115,56 @@ class PatientService:
                 clinician_id=clinician_id,
                 care_team_id=care_team_id,
             )
+
+            # Check if an active break-glass session exists for this clinician and patient
+            active_bg = await break_glass_repository.find_active_session(
+                patient_id=patient_id, clinician_id=clinician_id
+            )
+
             if not is_assigned:
+                if active_bg:
+                    # Break-glass override is active!
+                    # SECURITY INVARIANT 1: Break-glass NEVER allows access to raw Aria data or private notes!
+                    lowered_res = resource_path.lower()
+                    if any(x in lowered_res for x in ["/documents/", "/raw", "aria", "private_note"]):
+                        await audit_service.log_access_denied_403(
+                            user_id=user_id,
+                            role=role,
+                            permission="records:read_raw",
+                            resource=resource_path,
+                            scope=user_scope,
+                            reason="Break-glass emergency access prohibited from viewing raw Aria data or private notes",
+                            ip_address=client_ip,
+                        )
+                        raise HTTPException(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Access denied: Break-glass emergency access is strictly limited to emergency summaries and active medications. Access to raw Aria data and private notes is prohibited (audited).",
+                        )
+
+                    # SECURITY INVARIANT 2: Normal patient overview/timeline access remains strictly DENIED!
+                    # Break-glass is strictly limited to emergency views (/emergency-summary, /break-glass-view)
+                    is_emergency_resource = any(
+                        x in lowered_res for x in ["/emergency-summary", "/break-glass-view"]
+                    )
+                    if not is_emergency_resource:
+                        await audit_service.log_access_denied_403(
+                            user_id=user_id,
+                            role=role,
+                            permission="records:read",
+                            resource=resource_path or f"/patients/{patient_id}",
+                            scope=user_scope,
+                            reason="Break-glass emergency access is strictly limited to emergency clinical summaries. Normal chart access remains restricted.",
+                            ip_address=client_ip,
+                        )
+                        raise HTTPException(
+                            status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Access denied: Break-glass emergency access is strictly limited to the emergency clinical summary. Standard patient chart access remains restricted (audited).",
+                        )
+
+                    # Permitted under emergency break-glass override
+                    return patient
+
+                # Not assigned and no break glass -> strictly deny
                 await audit_service.log_access_denied_403(
                     user_id=user_id,
                     role=role,
@@ -123,6 +178,30 @@ class PatientService:
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Access denied: Clinician is not assigned to this patient's care team (audited).",
                 )
+
+            # Clinician IS assigned to care team: verify granular Consent Subsystem
+            recipient_id = user_scope.get("hospital_id") or user_id
+            has_consent = await consent_service.check_read_consent(
+                patient_id=patient_id,
+                recipient=recipient_id,
+                purpose=purpose,
+                category=category,
+            )
+            if not has_consent and not active_bg:
+                await audit_service.log_access_denied_403(
+                    user_id=user_id,
+                    role=role,
+                    permission="records:read",
+                    resource=resource_path or f"/patients/{patient_id}",
+                    scope=user_scope,
+                    reason=f"Patient '{patient_id}' has revoked or not granted consent for recipient '{recipient_id}' (category='{category}')",
+                    ip_address=client_ip,
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Access denied: Patient has revoked or not granted consent for clinical data sharing with this recipient/category (audited).",
+                )
+
             return patient
 
         # 4. Hospital Admin Scope: Patient must be linked to admin's hospital
@@ -221,6 +300,96 @@ class PatientService:
             "verified_records_count": verified_records_count,
             "pending_records_count": total_pending,
             "created_at": patient.get("created_at"),
+        }
+
+    async def get_patient_access_log(
+        self, patient_id: str, user: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Retrieves transparent patient access log including break-glass events,
+        standard clinician accesses, consent revocations, and access denials.
+        """
+        # Validate that caller is authorized to view this patient's logs
+        role = user.get("role")
+        user_scope = user.get("scope", {})
+        if role == "patient" and user_scope.get("patient_id") != patient_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Patients may only inspect their own access log.",
+            )
+
+        # 1. Fetch raw audit events
+        audit_events = await audit_service.get_patient_access_events(patient_id, limit=100)
+
+        # 2. Fetch break-glass sessions
+        bg_sessions = await break_glass_repository.list_sessions(patient_id=patient_id, limit=50)
+
+        entries = []
+        bg_count = 0
+
+        # Map break glass sessions
+        for s in bg_sessions:
+            bg_count += 1
+            granted_at = s.get("granted_at")
+            if isinstance(granted_at, str):
+                granted_at = datetime.fromisoformat(granted_at.replace("Z", "+00:00"))
+
+            entries.append({
+                "log_id": s.get("session_id"),
+                "timestamp": granted_at,
+                "accessor_id": s.get("clinician_id"),
+                "accessor_name": s.get("clinician_name"),
+                "accessor_role": s.get("clinician_role"),
+                "access_type": "break_glass_emergency",
+                "resource_accessed": "/emergency-summary",
+                "purpose": f"Emergency Override: {s.get('reason_category')}",
+                "break_glass_justification": s.get("justification"),
+                "break_glass_reason_category": s.get("reason_category"),
+                "break_glass_session_id": s.get("session_id"),
+                "status": s.get("status", "active"),
+                "ip_address": s.get("ip_address"),
+            })
+
+        # Map audit events
+        for ev in audit_events:
+            ev_type = ev.get("event_type", "")
+            ts = ev.get("timestamp")
+            if isinstance(ts, str):
+                ts = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+
+            details = ev.get("details", {})
+            acc_type = "standard"
+            if "DENIED" in ev.get("status", ""):
+                acc_type = "access_denied"
+            elif "CONSENT_REVOKED" in ev_type:
+                acc_type = "consent_revocation"
+            elif "BREAK_GLASS" in ev_type:
+                acc_type = "break_glass_emergency"
+
+            entries.append({
+                "log_id": str(ev.get("id") or ev.get("_id") or uuid4().hex[:8]),
+                "timestamp": ts,
+                "accessor_id": ev.get("user_id"),
+                "accessor_name": details.get("clinician_name"),
+                "accessor_role": ev.get("role"),
+                "access_type": acc_type,
+                "resource_accessed": details.get("target_resource") or details.get("resource") or ev_type,
+                "purpose": details.get("purpose") or details.get("reason"),
+                "break_glass_justification": details.get("justification"),
+                "break_glass_reason_category": details.get("reason_category"),
+                "break_glass_session_id": details.get("session_id"),
+                "status": ev.get("status", "SUCCESS"),
+                "ip_address": ev.get("ip_address"),
+            })
+
+        # Sort combined entries by timestamp descending
+        entries.sort(key=lambda x: x["timestamp"], reverse=True)
+
+        return {
+            "patient_id": patient_id,
+            "total_accesses": len(entries),
+            "break_glass_accesses_count": bg_count,
+            "entries": entries,
         }
 
 

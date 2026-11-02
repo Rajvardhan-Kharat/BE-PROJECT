@@ -14,6 +14,8 @@ import {
   History,
   HeartPulse,
   Cpu,
+  ShieldCheck,
+  Lock,
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useAuth } from '../../context/AuthContext'
@@ -82,6 +84,27 @@ export const Sidebar: React.FC = () => {
       label: 'Emergency summary',
       icon: HeartPulse,
       roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'consent-settings',
+      path: '/consent',
+      label: 'Consent directives',
+      icon: ShieldCheck,
+      roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'access-log',
+      path: '/access-log',
+      label: 'Patient access log',
+      icon: ScrollText,
+      roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'break-glass-admin',
+      path: '/admin/break-glass',
+      label: 'Break-glass audit',
+      icon: Lock,
+      roles: ['hospital_admin', 'system_admin', 'senior_doctor'] as UserRole[],
     },
     {
       id: 'agent-runs',

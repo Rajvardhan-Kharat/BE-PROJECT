@@ -13,6 +13,10 @@ import { MedicationSafetyPage } from './pages/MedicationSafetyPage'
 import { TimelineAuditPage } from './pages/TimelineAuditPage'
 import { EmergencySummaryPage } from './pages/EmergencySummaryPage'
 import { AgentExecutionLogsPage } from './pages/AgentExecutionLogsPage'
+import { ConsentSettingsPage } from './pages/ConsentSettingsPage'
+import { PatientAccessLogPage } from './pages/PatientAccessLogPage'
+import { BreakGlassEmergencyViewPage } from './pages/BreakGlassEmergencyViewPage'
+import { AdminBreakGlassReviewPage } from './pages/AdminBreakGlassReviewPage'
 import { DevUiPage } from './pages/DevUiPage'
 import { EmptyState } from './components/ui/EmptyState'
 import { CheckSquare, ScrollText } from 'lucide-react'
@@ -61,6 +65,34 @@ export const router = createBrowserRouter([
       {
         path: 'emergency-summary',
         element: <EmergencySummaryPage />,
+      },
+      {
+        path: 'patients/:id/consent',
+        element: <ConsentSettingsPage />,
+      },
+      {
+        path: 'consent',
+        element: <ConsentSettingsPage />,
+      },
+      {
+        path: 'patients/:id/access-log',
+        element: <PatientAccessLogPage />,
+      },
+      {
+        path: 'access-log',
+        element: <PatientAccessLogPage />,
+      },
+      {
+        path: 'patients/:id/break-glass-view',
+        element: <BreakGlassEmergencyViewPage />,
+      },
+      {
+        path: 'admin/break-glass',
+        element: (
+          <ProtectedRoute allowedRoles={['hospital_admin', 'system_admin', 'senior_doctor']}>
+            <AdminBreakGlassReviewPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'safety',

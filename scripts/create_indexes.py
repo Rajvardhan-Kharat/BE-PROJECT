@@ -120,6 +120,29 @@ async def create_indexes():
         IndexModel([("started_at", ASCENDING)], name="idx_agent_logs_started_at"),
     ])
 
+    logger.info("Creating indexes for collection 'patient_consents'...")
+    await db.patient_consents.create_indexes([
+        IndexModel([("consent_id", ASCENDING)], unique=True, name="idx_consents_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_consents_patient_status"),
+        IndexModel([("patient_id", ASCENDING), ("recipient", ASCENDING), ("status", ASCENDING)], name="idx_consents_patient_recip_status"),
+    ])
+
+    logger.info("Creating indexes for collection 'break_glass_sessions'...")
+    await db.break_glass_sessions.create_indexes([
+        IndexModel([("session_id", ASCENDING)], unique=True, name="idx_bg_session_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("clinician_id", ASCENDING), ("status", ASCENDING)], name="idx_bg_pat_clin_status"),
+        IndexModel([("clinician_id", ASCENDING), ("granted_at", ASCENDING)], name="idx_bg_clin_granted_rate_limit"),
+        IndexModel([("review_status", ASCENDING)], name="idx_bg_review_status"),
+        IndexModel([("expires_at", ASCENDING)], name="idx_bg_expires_at"),
+    ])
+
+    logger.info("Creating indexes for collection 'patient_notifications'...")
+    await db.patient_notifications.create_indexes([
+        IndexModel([("notification_id", ASCENDING)], unique=True, name="idx_notif_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("created_at", ASCENDING)], name="idx_notif_patient_created"),
+        IndexModel([("patient_id", ASCENDING), ("read", ASCENDING)], name="idx_notif_patient_read"),
+    ])
+
     client.close()
     logger.info("All MongoDB indexes created successfully.")
 

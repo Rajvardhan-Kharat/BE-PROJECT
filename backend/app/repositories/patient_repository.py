@@ -46,5 +46,16 @@ class PatientRepository(BaseRepository):
 
         return await self.find_many(query=query, skip=skip, limit=limit, sort=[("name", 1)])
 
+    async def update_patient(self, patient_id: str, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        collection = await self.get_collection()
+        result = await collection.find_one_and_update(
+            {"patient_id": patient_id},
+            {"$set": updates},
+            return_document=True,
+        )
+        if result and "_id" in result:
+            result["id"] = str(result.pop("_id"))
+        return result
+
 
 patient_repository = PatientRepository()

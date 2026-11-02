@@ -3,8 +3,10 @@ from fastapi import APIRouter, Depends, Query, Request
 from backend.app.permissions.rbac import get_current_user
 from backend.app.repositories.encounter_repository import encounter_repository
 from backend.app.repositories.organization_repository import organization_repository
+from backend.app.repositories.patient_notification_repository import patient_notification_repository
 from backend.app.repositories.patient_repository import patient_repository
 from backend.app.repositories.record_version_repository import record_version_repository
+from backend.app.schemas.access_log import PatientAccessLogResponse
 from backend.app.schemas.patient import (
     EncounterResponse,
     PatientOverview,
@@ -12,6 +14,7 @@ from backend.app.schemas.patient import (
     PatientTimelineResponse,
     TimelineEvent,
 )
+from backend.app.schemas.patient_notification import PatientNotificationResponse
 from backend.app.schemas.verification import RecordVersionResponse
 from backend.app.services.patient_service import patient_service
 
@@ -253,3 +256,58 @@ async def get_patient_encounters(
         )
         for e in encounters
     ]
+
+
+@router.get("/patients/{patient_id}/access-log", response_model=PatientAccessLogResponse)
+async def get_patient_access_log(
+    patient_id: str,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Transparent patient access audit log:
+    Shows all individuals and systems that accessed this patient record,
+    with prominence given to break-glass emergency overrides and consent revocations.
+    """
+    result = await patient_service.get_patient_access_log(patient_id=patient_id, user=current_user)
+    return PatientAccessLogResponse(**result)
+
+
+@router.get("/patients/{patient_id}/notifications", response_model=List[PatientNotificationResponse])
+async def list_patient_notifications(
+    patient_id: str,
+    request: Request,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    In-app patient notification feed (break-glass alerts, consent revocation confirmations).
+    """
+    # Enforce patient self or authorized scope
+    if current_user.get("role") == "patient" and current_user.get("scope", {}).get("patient_id") != patient_id:
+        return []
+
+    notifications = await patient_notification_repository.list_for_patient(
+        patient_id=patient_id, skip=skip, limit=limit
+    )
+    return [PatientNotificationResponse(**n) for n in notifications]
+
+
+@router.post("/patients/{patient_id}/notifications/{notification_id}/read", response_model=Optional[PatientNotificationResponse])
+async def mark_patient_notification_read(
+    patient_id: str,
+    notification_id: str,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Marks an in-app patient notification as read.
+    """
+    if current_user.get("role") == "patient" and current_user.get("scope", {}).get("patient_id") != patient_id:
+        return None
+
+    updated = await patient_notification_repository.mark_as_read(
+        notification_id=notification_id, patient_id=patient_id
+    )
+    return PatientNotificationResponse(**updated) if updated else None

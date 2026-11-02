@@ -23,11 +23,15 @@ import {
   Pill,
   History,
   HeartPulse,
+  ShieldAlert,
+  ScrollText,
 } from 'lucide-react'
+import { BreakGlassRequestModal } from '../components/break_glass/BreakGlassRequestModal'
 
 export const PatientOverviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [showBreakGlassModal, setShowBreakGlassModal] = React.useState(false)
 
   // 1. Query Patient Overview
   const {
@@ -92,14 +96,45 @@ export const PatientOverviewPage: React.FC = () => {
             ? overviewError.message
             : 'Access to this patient record is restricted or the record does not exist.'}
         </Banner>
-        <Button
-          size="sm"
-          variant="secondary"
-          icon={<ArrowLeft className="w-3.5 h-3.5" />}
-          onClick={() => navigate('/patients')}
-        >
-          Return to directory
-        </Button>
+        <div className="bg-amber-50 border border-amber-200 rounded p-4 text-xs space-y-3">
+          <div className="font-semibold text-amber-900 flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-amber-700" />
+            Emergency Clinical Override Available
+          </div>
+          <p className="text-amber-800">
+            If you are responding to an acute life-threatening emergency or clinical handoff for this patient,
+            you may activate an audited emergency break-glass override to view essential safety summaries.
+          </p>
+          <div className="flex items-center gap-2 pt-1">
+            <Button
+              size="sm"
+              variant="danger"
+              icon={<ShieldAlert className="w-3.5 h-3.5" />}
+              onClick={() => setShowBreakGlassModal(true)}
+            >
+              Request Emergency Break-Glass Access
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              icon={<ArrowLeft className="w-3.5 h-3.5" />}
+              onClick={() => navigate('/patients')}
+            >
+              Return to directory
+            </Button>
+          </div>
+        </div>
+
+        {showBreakGlassModal && id && (
+          <BreakGlassRequestModal
+            patientId={id}
+            onClose={() => setShowBreakGlassModal(false)}
+            onSuccess={() => {
+              setShowBreakGlassModal(false)
+              navigate(`/patients/${id}/break-glass-view`)
+            }}
+          />
+        )}
       </div>
     )
   }
@@ -117,6 +152,22 @@ export const PatientOverviewPage: React.FC = () => {
           Back to directory
         </Button>
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<ShieldCheck className="w-3.5 h-3.5 text-teal-700" />}
+            onClick={() => navigate(`/patients/${patient.patient_id}/consent`)}
+          >
+            Consent
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<ScrollText className="w-3.5 h-3.5 text-slate-600" />}
+            onClick={() => navigate(`/patients/${patient.patient_id}/access-log`)}
+          >
+            Access Log
+          </Button>
           <Button
             size="sm"
             variant="secondary"
@@ -140,6 +191,14 @@ export const PatientOverviewPage: React.FC = () => {
             onClick={() => navigate(`/patients/${patient.patient_id}/safety`)}
           >
             Medication Safety
+          </Button>
+          <Button
+            size="sm"
+            variant="danger"
+            icon={<ShieldAlert className="w-3.5 h-3.5 text-red-100" />}
+            onClick={() => setShowBreakGlassModal(true)}
+          >
+            Break-Glass
           </Button>
           <span className="text-2xs font-mono text-slate-400">
             Internal ID: {patient.patient_id}
@@ -457,6 +516,17 @@ export const PatientOverviewPage: React.FC = () => {
           )}
         </section>
       </div>
+
+      {showBreakGlassModal && patient && (
+        <BreakGlassRequestModal
+          patientId={patient.patient_id}
+          onClose={() => setShowBreakGlassModal(false)}
+          onSuccess={() => {
+            setShowBreakGlassModal(false)
+            navigate(`/patients/${patient.patient_id}/break-glass-view`)
+          }}
+        />
+      )}
     </div>
   )
 }

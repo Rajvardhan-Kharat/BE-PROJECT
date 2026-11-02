@@ -32,6 +32,11 @@ class PrescriptionRepository(BaseRepository):
             sort=[("start_date", -1)],
         )
 
+    async def list_prescriptions(
+        self, patient_id: str, status: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        return await self.get_by_patient(patient_id=patient_id, status=status)
+
     async def update_status(
         self,
         prescription_id: str,

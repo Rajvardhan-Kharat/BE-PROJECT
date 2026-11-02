@@ -8,6 +8,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from backend.app.api.v1.audit import router as audit_router
 from backend.app.api.v1.auth import router as auth_router
+from backend.app.api.v1.break_glass import router as break_glass_router
+from backend.app.api.v1.consent import router as consent_router
 from backend.app.api.v1.documents import router as documents_router
 from backend.app.api.v1.emergency import router as emergency_router
 from backend.app.api.v1.agent_runs import router as agent_runs_router
@@ -122,6 +124,8 @@ app.include_router(documents_router, prefix=api_v1_str, tags=["Documents & Extra
 app.include_router(verification_router, prefix=api_v1_str, tags=["Clinical Verification"])
 app.include_router(safety_router, prefix=api_v1_str, tags=["Clinical Safety & Conflict Detection"])
 app.include_router(timeline_audit_router, prefix=api_v1_str, tags=["Timeline Conflict Audit"])
+app.include_router(consent_router, prefix=api_v1_str, tags=["Consent Directives"])
+app.include_router(break_glass_router, prefix=api_v1_str, tags=["Break-Glass Emergency Access"])
 app.include_router(emergency_router, prefix=api_v1_str, tags=["Emergency Clinical Profile"])
 app.include_router(agent_runs_router, prefix=api_v1_str, tags=["Agent Execution Logs"])
 app.include_router(audit_router, prefix=api_v1_str, tags=["Audit Trail"])

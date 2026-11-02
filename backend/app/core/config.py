@@ -40,6 +40,14 @@ class Settings(BaseSettings):
     LLM_MODEL: str = "gpt-4o-mini"
     LLM_TIMEOUT_SECONDS: float = 10.0
 
+    # Break-Glass Emergency Override Configuration
+    BREAK_GLASS_ALLOWED_ROLES: List[str] = ["doctor", "senior_doctor"]
+    BREAK_GLASS_DEFAULT_DURATION_MINUTES: int = 60
+    BREAK_GLASS_RATE_LIMIT_PER_HOUR: int = 5
+
+    # Consent Subsystem Configuration
+    CONSENT_DEFAULT_TEXT_VERSION: str = "v1.0-synthetic-clinical-consent"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
