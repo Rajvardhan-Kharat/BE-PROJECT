@@ -20,6 +20,7 @@ import {
   Activity,
   FileCheck2,
   ArrowRight,
+  Pill,
 } from 'lucide-react'
 
 export const PatientOverviewPage: React.FC = () => {
@@ -113,9 +114,19 @@ export const PatientOverviewPage: React.FC = () => {
         >
           Back to directory
         </Button>
-        <span className="text-2xs font-mono text-slate-400">
-          Internal ID: {patient.patient_id}
-        </span>
+        <div className="flex items-center gap-3">
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<Pill className="w-3.5 h-3.5 text-teal-700" />}
+            onClick={() => navigate(`/patients/${patient.patient_id}/safety`)}
+          >
+            Medication Safety & Conflicts
+          </Button>
+          <span className="text-2xs font-mono text-slate-400">
+            Internal ID: {patient.patient_id}
+          </span>
+        </div>
       </div>
 
       {/* Patient Header Clinical Card */}

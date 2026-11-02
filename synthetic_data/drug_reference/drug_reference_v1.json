@@ -1,0 +1,314 @@
+{
+  "metadata": {
+    "title": "VeriCare AI Deterministic Drug Reference",
+    "version": "1.0.0",
+    "rule_set_label": "synthetic demonstration rules",
+    "description": "Rule catalog for deterministic clinical safety, allergy-class mapping, interaction checking, and prescription consistency verification. Synthetic demo rules only.",
+    "effective_date": "2026-11-01"
+  },
+  "aliases": {
+    "coumadin": "warfarin",
+    "jantoven": "warfarin",
+    "lipitor": "atorvastatin",
+    "zestril": "lisinopril",
+    "prinivil": "lisinopril",
+    "lopressor": "metoprolol",
+    "toprol-xl": "metoprolol",
+    "toprol xl": "metoprolol",
+    "amoxil": "amoxicillin",
+    "augmentin": "amoxicillin-clavulanate",
+    "bactrim": "sulfamethoxazole-trimethoprim",
+    "septra": "sulfamethoxazole-trimethoprim",
+    "glucophage": "metformin",
+    "plavix": "clopidogrel",
+    "cardizem": "diltiazem",
+    "lasix": "furosemide",
+    "aldactone": "spironolactone",
+    "lanoxin": "digoxin",
+    "prilosec": "omeprazole",
+    "zoloft": "sertraline",
+    "ultram": "tramadol",
+    "cipro": "ciprofloxacin",
+    "biaxin": "clarithromycin",
+    "synthroid": "levothyroxine",
+    "viagra": "sildenafil",
+    "nitrostat": "nitroglycerin",
+    "advil": "ibuprofen",
+    "motrin": "ibuprofen",
+    "aleve": "naproxen",
+    "toradol": "ketorolac",
+    "tylenol": "acetaminophen"
+  },
+  "allergy_classes": {
+    "penicillin": {
+      "display_name": "Penicillin Class Antibiotics",
+      "members": [
+        "penicillin",
+        "penicillin v",
+        "penicillin g",
+        "amoxicillin",
+        "ampicillin",
+        "amoxicillin-clavulanate",
+        "piperacillin",
+        "piperacillin-tazobactam",
+        "oxacillin",
+        "nafcillin"
+      ],
+      "cross_reactivity_warnings": ["cephalosporins (low cross-reactivity ~1-2%)"]
+    },
+    "sulfa": {
+      "display_name": "Sulfonamide Antibacterials",
+      "members": [
+        "sulfamethoxazole",
+        "sulfamethoxazole-trimethoprim",
+        "sulfadiazine",
+        "sulfasalazine",
+        "bactrim",
+        "septra"
+      ],
+      "cross_reactivity_warnings": []
+    },
+    "nsaid": {
+      "display_name": "Nonsteroidal Anti-inflammatory Drugs",
+      "members": [
+        "aspirin",
+        "ibuprofen",
+        "naproxen",
+        "ketorolac",
+        "meloxicam",
+        "celecoxib",
+        "indomethacin",
+        "diclofenac"
+      ],
+      "cross_reactivity_warnings": []
+    },
+    "ace_inhibitor": {
+      "display_name": "ACE Inhibitors (Angioedema/Cough)",
+      "members": [
+        "lisinopril",
+        "enalapril",
+        "ramipril",
+        "benazepril",
+        "captopril"
+      ],
+      "cross_reactivity_warnings": []
+    },
+    "statin": {
+      "display_name": "HMG-CoA Reductase Inhibitors",
+      "members": [
+        "atorvastatin",
+        "simvastatin",
+        "rosuvastatin",
+        "pravastatin",
+        "lovastatin"
+      ],
+      "cross_reactivity_warnings": []
+    }
+  },
+  "interactions": [
+    {
+      "rule_id": "DDI-SYN-001",
+      "version": "1.0",
+      "source": "FDA Clinical Pharmacology Guidance / Synthetic Demonstration Reference",
+      "drug_a": "warfarin",
+      "drug_b": "aspirin",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Additive anticoagulant and antiplatelet effect leading to significantly increased risk of major gastrointestinal and systemic hemorrhage.",
+      "rationale": "Warfarin inhibits vitamin K epoxide reductase, while Aspirin irreversibly inhibits COX-1 platelet aggregation. Concurrent therapy requires verified specialist indication."
+    },
+    {
+      "rule_id": "DDI-SYN-002",
+      "version": "1.0",
+      "source": "AHA/ACC Heart Failure Guideline Synthetic Summary",
+      "drug_a": "lisinopril",
+      "drug_b": "spironolactone",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Synergistic potassium retention causing severe hyperkalemia (>5.5 mEq/L) and cardiac dysrhythmias.",
+      "rationale": "ACE inhibition decreases aldosterone secretion, while spironolactone directly antagonizes mineralocorticoid receptors in the distal tubule."
+    },
+    {
+      "rule_id": "DDI-SYN-003",
+      "version": "1.0",
+      "source": "Clinical Electrophysiology Synthetic Knowledgebase",
+      "drug_a": "metoprolol",
+      "drug_b": "diltiazem",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Combined negative chronotropic and inotropic effects leading to profound bradycardia, high-grade AV block, or acute heart failure exacerbation.",
+      "rationale": "Additive suppression of sinoatrial and atrioventricular nodal conduction by beta-1 blockade and L-type calcium channel blockade."
+    },
+    {
+      "rule_id": "DDI-SYN-004",
+      "version": "1.0",
+      "source": "CYP450 Enzyme Interaction Catalog v1",
+      "drug_a": "atorvastatin",
+      "drug_b": "clarithromycin",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Marked increase in systemic statin exposure resulting in acute myopathy, myoglobinuria, or life-threatening rhabdomyolysis.",
+      "rationale": "Clarithromycin is a potent CYP3A4 inhibitor that blocks the primary oxidative metabolism pathway of atorvastatin."
+    },
+    {
+      "rule_id": "DDI-SYN-005",
+      "version": "1.0",
+      "source": "AHA Nitrates Safety Standard",
+      "drug_a": "sildenafil",
+      "drug_b": "nitroglycerin",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Profound, potentially refractory systemic vasodilation, precipitous drop in coronary perfusion pressure, and fatal myocardial infarction.",
+      "rationale": "PDE5 inhibition by sildenafil potentiates cGMP accumulation induced by nitric oxide donors like nitroglycerin."
+    },
+    {
+      "rule_id": "DDI-SYN-006",
+      "version": "1.0",
+      "source": "Pulmonary Medicine Drug Interaction Reference",
+      "drug_a": "ciprofloxacin",
+      "drug_b": "theophylline",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Elevated theophylline serum concentration causing nausea, seizures, ventricular tachycardia, and neurotoxicity.",
+      "rationale": "Ciprofloxacin inhibits hepatic CYP1A2, which is responsible for >85% of theophylline clearance."
+    },
+    {
+      "rule_id": "DDI-SYN-007",
+      "version": "1.0",
+      "source": "Rheumatology Safety Compendium Synthetic v1",
+      "drug_a": "methotrexate",
+      "drug_b": "ibuprofen",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Reduced renal excretion of methotrexate resulting in severe bone marrow suppression, leukopenia, and mucositis.",
+      "rationale": "NSAIDs competitively inhibit the organic anion transporters (OAT1/OAT3) responsible for renal tubular excretion of methotrexate."
+    },
+    {
+      "rule_id": "DDI-SYN-008",
+      "version": "1.0",
+      "source": "Psychiatric Clinical Safety Manual",
+      "drug_a": "lithium",
+      "drug_b": "hydrochlorothiazide",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Significant reduction in renal lithium clearance with rapid development of neurotoxicity, ataxia, tremor, and acute kidney injury.",
+      "rationale": "Thiazide-induced sodium depletion stimulates compensatory proximal tubular reabsorption of both sodium and lithium."
+    },
+    {
+      "rule_id": "DDI-SYN-009",
+      "version": "1.0",
+      "source": "FDA Antiplatelet Guidance Bulletin",
+      "drug_a": "clopidogrel",
+      "drug_b": "omeprazole",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Impaired metabolic activation of clopidogrel resulting in loss of antiplatelet efficacy and increased risk of stent thrombosis or recurrent ischemic stroke.",
+      "rationale": "Omeprazole competitively inhibits CYP2C19, the mandatory enzyme converting clopidogrel prodrug into its active thiol metabolite."
+    },
+    {
+      "rule_id": "DDI-SYN-010",
+      "version": "1.0",
+      "source": "Clinical Toxicology Reference Table",
+      "drug_a": "digoxin",
+      "drug_b": "amiodarone",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Double or triple digoxin plasma levels causing lethal ventricular arrhythmias, visual disturbances, and hyperkalemia.",
+      "rationale": "Amiodarone inhibits P-glycoprotein (MDR1) renal and biliary efflux of digoxin, halving its clearance."
+    },
+    {
+      "rule_id": "DDI-SYN-011",
+      "version": "1.0",
+      "source": "Neurology & Pain Safety Group Synthetic Rules",
+      "drug_a": "sertraline",
+      "drug_b": "tramadol",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Excessive central serotonergic neurotransmission leading to Serotonin Syndrome (hyperthermia, hyperreflexia, clonus, autonomic instability).",
+      "rationale": "Combined serotonin reuptake inhibition by SSRI (sertraline) and tramadol plus stimulation of 5-HT1A receptors."
+    },
+    {
+      "rule_id": "DDI-SYN-012",
+      "version": "1.0",
+      "source": "Renal Pharmacology Synthetic Catalog",
+      "drug_a": "potassium chloride",
+      "drug_b": "triamterene",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Hazardous hyperkalemia leading to flaccid paralysis, sinus arrest, or asystole.",
+      "rationale": "Exogenous potassium supplementation administered concurrently with a potassium-sparing epithelial sodium channel (ENaC) blocker."
+    },
+    {
+      "rule_id": "DDI-SYN-013",
+      "version": "1.0",
+      "source": "Anticoagulation Governance Guideline",
+      "drug_a": "warfarin",
+      "drug_b": "ciprofloxacin",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Rapid supratherapeutic INR elevation and dramatic increase in spontaneous bleeding risk.",
+      "rationale": "Ciprofloxacin disrupts intestinal vitamin K synthesis and inhibits CYP1A2 and CYP3A4-mediated R-warfarin clearance."
+    },
+    {
+      "rule_id": "DDI-SYN-014",
+      "version": "1.0",
+      "source": "Lipid Governance Synthetic Standard",
+      "drug_a": "simvastatin",
+      "drug_b": "gemfibrozil",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "High incidence of severe rhabdomyolysis and acute renal tubular necrosis.",
+      "rationale": "Gemfibrozil inhibits statin glucuronidation via UGT1A1/1A3 and inhibits OATP1B1 hepatic uptake, multiplying simvastatin acid bioavailability."
+    },
+    {
+      "rule_id": "DDI-SYN-015",
+      "version": "1.0",
+      "source": "Immunopharmacology Synthetic Safety Rules",
+      "drug_a": "allopurinol",
+      "drug_b": "azathioprine",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Severe, fatal pancytopenia and profound immunosuppression.",
+      "rationale": "Allopurinol blocks xanthine oxidase, preventing the physiological degradation of 6-mercaptopurine (the active metabolite of azathioprine)."
+    },
+    {
+      "rule_id": "DDI-SYN-016",
+      "version": "1.0",
+      "source": "Endocrine Safety Demonstration Rules",
+      "drug_a": "levothyroxine",
+      "drug_b": "ferrous sulfate",
+      "type": "potential_clinical_concern",
+      "clinical_effect": "Insoluble chelate formation in the gastrointestinal lumen leading to subtherapeutic thyroid hormone absorption and refractory hypothyroidism.",
+      "rationale": "Divalent iron ions bind levothyroxine directly; doses must be separated by at least 4 hours."
+    }
+  ],
+  "dosage_limits": {
+    "lisinopril": {
+      "max_single_dose_mg": 40,
+      "max_daily_dose_mg": 80,
+      "max_duration_days": null,
+      "unit": "mg"
+    },
+    "metoprolol": {
+      "max_single_dose_mg": 200,
+      "max_daily_dose_mg": 400,
+      "max_duration_days": null,
+      "unit": "mg"
+    },
+    "atorvastatin": {
+      "max_single_dose_mg": 80,
+      "max_daily_dose_mg": 80,
+      "max_duration_days": null,
+      "unit": "mg"
+    },
+    "amoxicillin": {
+      "max_single_dose_mg": 1000,
+      "max_daily_dose_mg": 3000,
+      "max_duration_days": 21,
+      "unit": "mg"
+    },
+    "ibuprofen": {
+      "max_single_dose_mg": 800,
+      "max_daily_dose_mg": 3200,
+      "max_duration_days": 14,
+      "unit": "mg"
+    },
+    "ketorolac": {
+      "max_single_dose_mg": 30,
+      "max_daily_dose_mg": 120,
+      "max_duration_days": 5,
+      "unit": "mg"
+    },
+    "acetaminophen": {
+      "max_single_dose_mg": 1000,
+      "max_daily_dose_mg": 4000,
+      "max_duration_days": null,
+      "unit": "mg"
+    }
+  }
+}

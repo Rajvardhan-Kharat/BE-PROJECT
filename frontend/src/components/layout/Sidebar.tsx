@@ -60,6 +60,13 @@ export const Sidebar: React.FC = () => {
       roles: ['doctor', 'senior_doctor', 'system_admin'] as UserRole[],
     },
     {
+      id: 'medication-safety',
+      path: '/safety',
+      label: 'Medication safety',
+      icon: ShieldAlert,
+      roles: ['patient', 'doctor', 'senior_doctor', 'system_admin'] as UserRole[],
+    },
+    {
       id: 'worklist',
       path: '/worklist',
       label: 'Clinical worklist',

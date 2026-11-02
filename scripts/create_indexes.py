@@ -90,6 +90,20 @@ async def create_indexes():
         IndexModel([("hospital_id", ASCENDING)], name="idx_record_versions_hospital"),
     ])
 
+    logger.info("Creating indexes for collection 'clinical_alerts'...")
+    await db.clinical_alerts.create_indexes([
+        IndexModel([("alert_id", ASCENDING)], unique=True, name="idx_clinical_alerts_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_clinical_alerts_patient_status"),
+        IndexModel([("patient_id", ASCENDING), ("rule_id", ASCENDING), ("evidence_signature", ASCENDING)], name="idx_clinical_alerts_dedup"),
+        IndexModel([("type", ASCENDING)], name="idx_clinical_alerts_type"),
+    ])
+
+    logger.info("Creating indexes for collection 'prescriptions'...")
+    await db.prescriptions.create_indexes([
+        IndexModel([("prescription_id", ASCENDING)], unique=True, name="idx_prescriptions_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_prescriptions_patient_status"),
+    ])
+
     client.close()
     logger.info("All MongoDB indexes created successfully.")
 

@@ -558,6 +558,62 @@ async def seed_all():
             upsert=True,
         )
 
+    # 8. Seed Synthetic Prescriptions
+    logger.info("Seeding synthetic prescriptions...")
+    SYNTHETIC_PRESCRIPTIONS = [
+        {
+            "prescription_id": "RX-PAT001-001",
+            "patient_id": "PAT-SYN-001",
+            "encounter_id": "ENC-2026-081",
+            "drug_name": "Metoprolol Tartrate",
+            "dosage": "25 mg",
+            "frequency": "BID",
+            "route": "PO",
+            "duration_days": 90,
+            "status": "active",
+            "start_date": "2026-10-18",
+            "prescribed_by": "Dr. Marcus Vance",
+            "hospital_id": "HOSP-METRO-01",
+            "notes": "Rate control for paroxysmal AFib",
+        },
+        {
+            "prescription_id": "RX-PAT001-002",
+            "patient_id": "PAT-SYN-001",
+            "encounter_id": "ENC-2026-081",
+            "drug_name": "Lisinopril",
+            "dosage": "10 mg",
+            "frequency": "daily",
+            "route": "PO",
+            "duration_days": 90,
+            "status": "active",
+            "start_date": "2026-10-18",
+            "prescribed_by": "Dr. Marcus Vance",
+            "hospital_id": "HOSP-METRO-01",
+            "notes": "Antihypertensive therapy",
+        },
+        {
+            "prescription_id": "RX-PAT001-003",
+            "patient_id": "PAT-SYN-001",
+            "encounter_id": "ENC-2026-081",
+            "drug_name": "Atorvastatin",
+            "dosage": "20 mg",
+            "frequency": "bedtime",
+            "route": "PO",
+            "duration_days": 90,
+            "status": "active",
+            "start_date": "2026-10-18",
+            "prescribed_by": "Dr. Marcus Vance",
+            "hospital_id": "HOSP-METRO-01",
+            "notes": "Lipid management",
+        },
+    ]
+    for rx in SYNTHETIC_PRESCRIPTIONS:
+        await db.prescriptions.update_one(
+            {"prescription_id": rx["prescription_id"]},
+            {"$set": rx},
+            upsert=True,
+        )
+
     client.close()
     logger.info("Database seeding completed successfully.")
 
