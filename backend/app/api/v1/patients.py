@@ -4,6 +4,7 @@ from backend.app.permissions.rbac import get_current_user
 from backend.app.repositories.encounter_repository import encounter_repository
 from backend.app.repositories.organization_repository import organization_repository
 from backend.app.repositories.patient_repository import patient_repository
+from backend.app.repositories.record_version_repository import record_version_repository
 from backend.app.schemas.patient import (
     EncounterResponse,
     PatientOverview,
@@ -11,6 +12,7 @@ from backend.app.schemas.patient import (
     PatientTimelineResponse,
     TimelineEvent,
 )
+from backend.app.schemas.verification import RecordVersionResponse
 from backend.app.services.patient_service import patient_service
 
 router = APIRouter()
@@ -111,12 +113,24 @@ async def get_patient_timeline(
         patient_id=patient_id, skip=skip, limit=limit
     )
 
+    # INVARIANT: Only APPROVED data appears in the trusted timeline.
+    # Pending proposals and unverified extracts are strictly excluded.
+    approved_records = await record_version_repository.get_patient_approved_records(
+        patient_id=patient_id, skip=skip, limit=limit
+    )
+
     # Gather hospital names
     hospital_ids = list({e["hospital_id"] for e in encounters if "hospital_id" in e})
+    for r in approved_records:
+        if r.get("hospital_id") and r["hospital_id"] not in hospital_ids:
+            hospital_ids.append(r["hospital_id"])
+
     hospitals = await organization_repository.get_by_hospital_ids(hospital_ids)
     hosp_map = {h["hospital_id"]: h["name"] for h in hospitals}
 
     timeline_events: List[TimelineEvent] = []
+
+    # 1. Add encounters
     for enc in encounters:
         hosp_name = hosp_map.get(enc.get("hospital_id"), "Medical Facility")
         timeline_events.append(
@@ -137,12 +151,62 @@ async def get_patient_timeline(
             )
         )
 
+    # 2. Add approved verified clinical records
+    for rec in approved_records:
+        hosp_name = hosp_map.get(rec.get("hospital_id"), "Medical Facility")
+        ts = rec.get("clinical_timestamp")
+        if not ts and rec.get("reviewed_at"):
+            ts = rec["reviewed_at"].strftime("%Y-%m-%d %H:%M")
+        timeline_events.append(
+            TimelineEvent(
+                event_id=rec["version_id"],
+                event_type="verified_clinical_record",
+                timestamp=ts or "",
+                title=f"Verified Record: {rec.get('title', 'Clinical Record')} (v{rec.get('version_number', 1)})",
+                department=rec.get("department", "Department"),
+                hospital_name=hosp_name,
+                status="approved",
+                details={
+                    "record_id": rec["record_id"],
+                    "version_number": rec.get("version_number", 1),
+                    "record_type": rec.get("record_type", "general"),
+                    "reviewed_by": rec.get("reviewer_name") or rec.get("reviewed_by"),
+                    "reviewed_at": rec.get("reviewed_at").isoformat() if rec.get("reviewed_at") else None,
+                    "data": rec.get("data", {}),
+                },
+            )
+        )
+
+    # Sort descending by timestamp
+    timeline_events.sort(key=lambda x: x.timestamp or "", reverse=True)
+
     return PatientTimelineResponse(
         patient_id=patient["patient_id"],
         mrn=patient["mrn"],
         total_events=len(timeline_events),
         events=timeline_events,
     )
+
+
+@router.get("/patients/{patient_id}/pending-records", response_model=List[RecordVersionResponse])
+async def get_patient_pending_records(
+    patient_id: str,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Returns clinical proposals currently awaiting verification or requiring correction.
+    INVARIANT: Displayed in a separate section from the trusted clinical timeline.
+    """
+    client_ip = request.client.host if request.client else None
+    await patient_service.check_patient_access(
+        user=current_user,
+        patient_id=patient_id,
+        resource_path=str(request.url.path),
+        client_ip=client_ip,
+    )
+    records = await record_version_repository.get_patient_pending_records(patient_id)
+    return [RecordVersionResponse(**r) for r in records]
 
 
 @router.get("/patients/{patient_id}/encounters", response_model=List[EncounterResponse])

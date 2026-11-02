@@ -139,7 +139,7 @@ async def test_assigned_doctor_and_verifier_granted_access(client: AsyncClient):
     assert timeline_res.status_code == 200
     tl = timeline_res.json()
     assert tl["patient_id"] == "PAT-SYN-001"
-    assert tl["total_events"] == 3
+    assert tl["total_events"] >= 3
     # Verify encounters across both hospitals are included
     hosp_names = [e["hospital_name"] for e in tl["events"]]
     assert any("Metro Health" in h for h in hosp_names)

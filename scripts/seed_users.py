@@ -239,6 +239,136 @@ SYNTHETIC_ENCOUNTERS = [
 ]
 
 
+SYNTHETIC_RECORD_VERSIONS = [
+    # 1. Approved Record v1 (Cardiology Discharge Summary)
+    {
+        "version_id": "VER-20261018-001",
+        "record_id": "REC-PAT001-CARDIO-01",
+        "patient_id": "PAT-SYN-001",
+        "version_number": 1,
+        "status": "approved",
+        "record_type": "discharge_summary",
+        "title": "Discharge Summary - Paroxysmal Atrial Fibrillation",
+        "department": "Cardiology",
+        "hospital_id": "HOSP-METRO-01",
+        "care_team_id": "CT-CARDIO-A",
+        "data": {
+            "primary_diagnosis": "Paroxysmal atrial fibrillation (ICD-10 I48.0)",
+            "secondary_diagnosis": "Essential hypertension (I10)",
+            "discharge_medications": [
+                "Metoprolol Tartrate 25 mg PO BID",
+                "Lisinopril 10 mg PO daily",
+                "Atorvastatin 20 mg PO bedtime",
+            ],
+            "allergies": ["Penicillin", "Sulfa drugs"],
+            "discharge_date": "2026-10-18",
+        },
+        "source_document_id": "DOC-SYN-84920-01",
+        "source_text_snippet": "Primary Diagnosis: Paroxysmal atrial fibrillation (ICD-10 I48.0). Discharge Medications: Metoprolol 25mg BID.",
+        "extracted_fields": [
+            {
+                "field_name": "primary_diagnosis",
+                "value": "Paroxysmal atrial fibrillation (ICD-10 I48.0)",
+                "status": "explicit",
+                "confidence_note": "Extracted with high confidence",
+            },
+            {
+                "field_name": "discharge_date",
+                "value": "2026-10-18",
+                "status": "explicit",
+                "confidence_note": "Extracted from header",
+            },
+        ],
+        "submitted_by": "USR-DOC-CARDIO-001",
+        "submitter_name": "Dr. Marcus Vance",
+        "submitted_at": datetime(2026, 10, 18, 14, 0, tzinfo=timezone.utc),
+        "reviewed_by": "USR-VERIFIER-001",
+        "reviewer_name": "Dr. Sarah Lin",
+        "reviewed_at": datetime(2026, 10, 18, 15, 30, tzinfo=timezone.utc),
+        "review_decision": "approved",
+        "review_reason": "Verified against telemetry discharge summary and vital records.",
+        "superseded_by": None,
+        "superseded_at": None,
+        "clinical_timestamp": "2026-10-18 14:00",
+        "created_at": datetime(2026, 10, 18, 14, 0, tzinfo=timezone.utc),
+    },
+    # 2. Pending Review Record v1 (Aria AI / Clinician Proposed Titration)
+    {
+        "version_id": "VER-20261024-002",
+        "record_id": "REC-PAT001-CARDIO-02",
+        "patient_id": "PAT-SYN-001",
+        "version_number": 1,
+        "status": "pending_review",
+        "record_type": "medication_reconciliation",
+        "title": "Aria AI Proposal: Beta-Blocker Dose Titration",
+        "department": "Cardiology",
+        "hospital_id": "HOSP-METRO-01",
+        "care_team_id": "CT-CARDIO-A",
+        "data": {
+            "proposed_medication": "Metoprolol Tartrate 50 mg PO BID",
+            "previous_medication": "Metoprolol Tartrate 25 mg PO BID",
+            "clinical_indication": "Resting pulse 92 bpm at outpatient cardiology visit; inadequate rate control.",
+            "titration_rationale": "Gradual upward titration recommended per ACC/AHA AFib guidelines.",
+        },
+        "source_document_id": "DOC-SYN-84920-01",
+        "source_text_snippet": "Outpatient Follow-up: Resting heart rate remains 92 bpm. Plan: Increase Metoprolol to 50mg BID.",
+        "extracted_fields": [
+            {
+                "field_name": "proposed_medication",
+                "value": "Metoprolol Tartrate 50 mg PO BID",
+                "status": "inferred",
+                "confidence_note": "Aria proposal from encounter follow-up notes",
+            },
+        ],
+        "submitted_by": "USR-DOC-CARDIO-001",
+        "submitter_name": "Dr. Marcus Vance",
+        "submitted_at": datetime(2026, 10, 24, 11, 45, tzinfo=timezone.utc),
+        "reviewed_by": None,
+        "reviewer_name": None,
+        "reviewed_at": None,
+        "review_decision": None,
+        "review_reason": None,
+        "superseded_by": None,
+        "superseded_at": None,
+        "clinical_timestamp": "2026-10-24 10:15",
+        "created_at": datetime(2026, 10, 24, 11, 45, tzinfo=timezone.utc),
+    },
+    # 3. Requires Correction Record v1 (Oncology extract requiring biopsy code)
+    {
+        "version_id": "VER-20261028-003",
+        "record_id": "REC-PAT001-ONCO-01",
+        "patient_id": "PAT-SYN-001",
+        "version_number": 1,
+        "status": "requires_correction",
+        "record_type": "clinical_note",
+        "title": "Oncology Baseline Screening Extract",
+        "department": "Oncology",
+        "hospital_id": "HOSP-METRO-01",
+        "care_team_id": "CT-ONCO-4",
+        "data": {
+            "consultation_reason": "Screening for palpable nodule",
+            "biopsy_ordered": "true",
+            "provisional_code": "C79.9 (Unspecified secondary malignant neoplasm)",
+        },
+        "source_document_id": None,
+        "source_text_snippet": "Screening note: Palpable nodule. Core biopsy ordered.",
+        "extracted_fields": [],
+        "submitted_by": "USR-DOC-ONCO-002",
+        "submitter_name": "Dr. Elena Rostova",
+        "submitted_at": datetime(2026, 10, 28, 9, 30, tzinfo=timezone.utc),
+        "reviewed_by": "USR-VERIFIER-001",
+        "reviewer_name": "Dr. Sarah Lin",
+        "reviewed_at": datetime(2026, 10, 28, 14, 0, tzinfo=timezone.utc),
+        "review_decision": "requires_correction",
+        "review_reason": "Provisional ICD code C79.9 inappropriate prior to histological pathology report. Please adjust to benign/screening code pending lab results.",
+        "superseded_by": None,
+        "superseded_at": None,
+        "clinical_timestamp": "2026-10-28 09:00",
+        "created_at": datetime(2026, 10, 28, 9, 30, tzinfo=timezone.utc),
+    },
+]
+
+
 def get_synthetic_users():
     pw_hash = hash_password(DEFAULT_DEV_PASSWORD)
 
@@ -416,6 +546,15 @@ async def seed_all():
         await db.encounters.update_one(
             {"encounter_id": enc["encounter_id"]},
             {"$set": enc},
+            upsert=True,
+        )
+
+    # 7. Seed Record Versions (Approved, Pending Review, Requires Correction)
+    logger.info("Seeding synthetic record_versions...")
+    for rec in SYNTHETIC_RECORD_VERSIONS:
+        await db.record_versions.update_one(
+            {"version_id": rec["version_id"]},
+            {"$set": rec},
             upsert=True,
         )
 

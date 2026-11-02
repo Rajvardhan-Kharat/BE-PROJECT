@@ -55,6 +55,11 @@ export interface TimelineEvent {
     attending_doctor_name?: string
     discharge_date?: string
     diagnosis_codes?: string[]
+    version_number?: number
+    record_type?: string
+    reviewed_by?: string
+    reviewed_at?: string
+    data?: Record<string, any>
   }
 }
 

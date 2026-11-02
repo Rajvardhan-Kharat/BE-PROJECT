@@ -4,6 +4,7 @@ from backend.app.repositories.care_team_repository import care_team_repository
 from backend.app.repositories.encounter_repository import encounter_repository
 from backend.app.repositories.organization_repository import organization_repository
 from backend.app.repositories.patient_repository import patient_repository
+from backend.app.repositories.record_version_repository import record_version_repository
 from backend.app.services.audit_service import audit_service
 
 
@@ -184,9 +185,17 @@ class PatientService:
 
         encounters_count = await encounter_repository.count_patient_encounters(patient_id)
 
-        # Verified and pending record counts (currently empty as AI review pipeline builds next)
-        verified_records_count = 0
-        pending_records_count = 0
+        # Dynamic verified and pending record counts from record_versions
+        verified_records_count = await record_version_repository.count_patient_records(
+            patient_id, "approved"
+        )
+        pending_records_count = await record_version_repository.count_patient_records(
+            patient_id, "pending_review"
+        )
+        correction_count = await record_version_repository.count_patient_records(
+            patient_id, "requires_correction"
+        )
+        total_pending = pending_records_count + correction_count
 
         return {
             "patient_id": patient["patient_id"],
@@ -210,7 +219,7 @@ class PatientService:
             "active_consent": patient.get("active_consent", True),
             "encounters_count": encounters_count,
             "verified_records_count": verified_records_count,
-            "pending_records_count": pending_records_count,
+            "pending_records_count": total_pending,
             "created_at": patient.get("created_at"),
         }
 

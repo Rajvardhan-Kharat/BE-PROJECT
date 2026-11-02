@@ -19,7 +19,7 @@ class BaseRepository:
         collection = await self.get_collection()
         doc = await collection.find_one(query)
         if doc and "_id" in doc:
-            doc["id"] = str(doc["_id"])
+            doc["id"] = str(doc.pop("_id"))
         return doc
 
     async def find_by_id(self, doc_id: str) -> Optional[Dict[str, Any]]:
@@ -40,7 +40,7 @@ class BaseRepository:
         results = []
         async for doc in cursor:
             if "_id" in doc:
-                doc["id"] = str(doc["_id"])
+                doc["id"] = str(doc.pop("_id"))
             results.append(doc)
         return results
 
@@ -48,6 +48,9 @@ class BaseRepository:
         collection = await self.get_collection()
         doc_to_insert = dict(document)
         result = await collection.insert_one(doc_to_insert)
+        if "_id" in doc_to_insert:
+            doc_to_insert["id"] = str(doc_to_insert.pop("_id"))
+        return doc_to_insert
         doc_to_insert["_id"] = result.inserted_id
         doc_to_insert["id"] = str(result.inserted_id)
         return doc_to_insert
