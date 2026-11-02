@@ -169,6 +169,14 @@ class ApiClient {
     })
   }
 
+  patch<T>(endpoint: string, body?: unknown, headers?: Record<string, string>): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      headers,
+    })
+  }
+
   delete<T>(endpoint: string, headers?: Record<string, string>): Promise<T> {
     return this.request<T>(endpoint, { method: 'DELETE', headers })
   }

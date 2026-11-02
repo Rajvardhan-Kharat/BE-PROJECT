@@ -742,7 +742,345 @@ async def seed_all():
             upsert=True,
         )
 
-    # 9. Clear any transient timeline conflicts for clean baseline
+    # 9. Seed Follow-ups & Medication Courses (Agent 5)
+    logger.info("Seeding synthetic follow-ups and medication courses...")
+    SYNTHETIC_FOLLOWUPS = [
+        {
+            "follow_up_id": "FOL-SYN-001",
+            "patient_id": "PAT-SYN-001",
+            "type": "appointment",
+            "title": "Cardiology Outpatient Follow-up",
+            "description": "Post-discharge telemetry review and blood pressure assessment.",
+            "due_date": "2026-11-20",
+            "scheduled_date": "2026-11-20 10:00",
+            "completed_date": None,
+            "status": "upcoming",
+            "care_team_id": "CT-CARDIO-A",
+            "assigned_doctor_id": "USR-DOC-CARDIO-001",
+            "medication_details": None,
+            "adherence_inferred": False,
+            "clinical_safety_note": "Deterministic schedule tracking only. Adherence is never inferred.",
+            "audit_history": [
+                {
+                    "from_status": "none",
+                    "to_status": "upcoming",
+                    "reason": "Scheduled at discharge from inpatient cardiology.",
+                    "changed_by": "USR-DOC-CARDIO-001",
+                    "changed_at": "2026-10-18T14:30:00Z",
+                }
+            ],
+            "created_at": "2026-10-18T14:30:00Z",
+            "updated_at": "2026-10-18T14:30:00Z",
+        },
+        {
+            "follow_up_id": "FOL-SYN-002",
+            "patient_id": "PAT-SYN-001",
+            "type": "medication_course",
+            "title": "Metoprolol 30-Day Titration Course",
+            "description": "30-day initial beta-blocker titration schedule. Review resting heart rate.",
+            "due_date": "2026-10-25",
+            "scheduled_date": "2026-10-25",
+            "completed_date": None,
+            "status": "overdue",
+            "care_team_id": "CT-CARDIO-A",
+            "assigned_doctor_id": "USR-DOC-CARDIO-001",
+            "medication_details": {
+                "medication_name": "Metoprolol Tartrate",
+                "dosage": "25 mg PO BID",
+                "prescribed_days": 30,
+                "start_date": "2026-09-25",
+                "expected_end_date": "2026-10-25",
+                "refills_authorized": 1,
+            },
+            "adherence_inferred": False,
+            "clinical_safety_note": "Deterministic schedule tracking only. Adherence is never inferred.",
+            "audit_history": [
+                {
+                    "from_status": "upcoming",
+                    "to_status": "overdue",
+                    "reason": "Target completion date (2026-10-25) elapsed without recorded clinical renewal or completion.",
+                    "changed_by": "AGENT-5-DETERMINISTIC",
+                    "changed_at": "2026-10-26T00:00:00Z",
+                }
+            ],
+            "created_at": "2026-09-25T10:00:00Z",
+            "updated_at": "2026-10-26T00:00:00Z",
+        },
+        {
+            "follow_up_id": "FOL-SYN-003",
+            "patient_id": "PAT-SYN-001",
+            "type": "lab_test",
+            "title": "Renal Panel & Serum Potassium Check",
+            "description": "Monitor serum creatinine and electrolytes post ACE-inhibitor therapy.",
+            "due_date": "2026-11-15",
+            "scheduled_date": None,
+            "completed_date": None,
+            "status": "upcoming",
+            "care_team_id": "CT-INTERNAL-B",
+            "assigned_doctor_id": "USR-VERIFIER-001",
+            "medication_details": None,
+            "adherence_inferred": False,
+            "clinical_safety_note": "Deterministic schedule tracking only. Adherence is never inferred.",
+            "audit_history": [],
+            "created_at": "2026-10-24T11:30:00Z",
+            "updated_at": "2026-10-24T11:30:00Z",
+        },
+        {
+            "follow_up_id": "FOL-SYN-004",
+            "patient_id": "PAT-SYN-001",
+            "type": "appointment",
+            "title": "Post-ED Allergic Reaction Review",
+            "description": "Assess rash resolution following emergency department discharge.",
+            "due_date": "2026-11-01",
+            "scheduled_date": "2026-11-01 11:00",
+            "completed_date": "2026-11-01",
+            "status": "completed",
+            "care_team_id": "CT-INTERNAL-B",
+            "assigned_doctor_id": "USR-VERIFIER-001",
+            "medication_details": None,
+            "adherence_inferred": False,
+            "clinical_safety_note": "Deterministic schedule tracking only. Adherence is never inferred.",
+            "audit_history": [
+                {
+                    "from_status": "upcoming",
+                    "to_status": "completed",
+                    "reason": "Patient attended outpatient review. Rash fully resolved.",
+                    "changed_by": "USR-VERIFIER-001",
+                    "changed_at": "2026-11-01T11:30:00Z",
+                }
+            ],
+            "created_at": "2026-10-30T05:00:00Z",
+            "updated_at": "2026-11-01T11:30:00Z",
+        },
+    ]
+    for fol in SYNTHETIC_FOLLOWUPS:
+        await db.follow_ups.update_one(
+            {"follow_up_id": fol["follow_up_id"]},
+            {"$set": fol},
+            upsert=True,
+        )
+
+    # 10. Seed Clinical Notes (Second Memory: Shared + Private)
+    logger.info("Seeding Second Memory clinical notes (shared + private)...")
+    SYNTHETIC_NOTES = [
+        {
+            "note_id": "NOTE-SYN-001",
+            "patient_id": "PAT-SYN-001",
+            "author_id": "USR-DOC-CARDIO-001",
+            "author_name": "Dr. Marcus Vance",
+            "author_role": "doctor",
+            "specialty": "Cardiology",
+            "title": "Post-MI Beta-Blocker Titration Plan",
+            "content": "Patient tolerated Metoprolol well. Target resting HR is 60-70 bpm. Scheduled follow-up in 2 weeks to assess blood pressure and orthostatic vitals. Monitor for bradycardia.",
+            "is_private": False,
+            "tags": ["Cardiology", "Beta-Blocker", "Titration"],
+            "citations": [
+                {
+                    "record_id": "REC-PAT001-CARDIO-01",
+                    "record_type": "discharge_summary",
+                    "date": "2026-10-18",
+                    "snippet": "Discharge Medications: Metoprolol 25mg BID.",
+                }
+            ],
+            "created_at": "2026-10-18T15:00:00Z",
+            "updated_at": "2026-10-18T15:00:00Z",
+        },
+        {
+            "note_id": "NOTE-SYN-002",
+            "patient_id": "PAT-SYN-001",
+            "author_id": "USR-VERIFIER-001",
+            "author_name": "Dr. Sarah Lin",
+            "author_role": "senior_doctor",
+            "specialty": "Internal Medicine",
+            "title": "Care Coordination & Allergy Flag Review",
+            "content": "Reviewed allergy history following emergency department presentation. Confirmed severe Sulfa urticaria. Trimethoprim-sulfamethoxazole is strictly contraindicated. Replaced with Nitrofurantoin if UTI prophylaxis required.",
+            "is_private": False,
+            "tags": ["Internal Medicine", "Allergy", "Sulfa"],
+            "citations": [
+                {
+                    "record_id": "ENC-2026-105",
+                    "record_type": "encounter",
+                    "date": "2026-10-29",
+                    "snippet": "Allergic urticaria secondary to sulfonamides.",
+                }
+            ],
+            "created_at": "2026-10-30T09:00:00Z",
+            "updated_at": "2026-10-30T09:00:00Z",
+        },
+        {
+            "note_id": "NOTE-SYN-003",
+            "patient_id": "PAT-SYN-001",
+            "author_id": "USR-DOC-CARDIO-001",
+            "author_name": "Dr. Marcus Vance",
+            "author_role": "doctor",
+            "specialty": "Cardiology",
+            "title": "Private Clinician Impression: Renal Trend Concerns",
+            "content": "Private clinician scratchpad: Serum creatinine has crept up from 1.1 to 1.4 mg/dL over past 6 months. Prior to up-titrating Lisinopril, need repeat BMP and potential nephrology consult. Do not adjust until lab check.",
+            "is_private": True,  # STRICTLY PRIVATE TO DR. VANCE
+            "tags": ["Private", "Renal", "Lisinopril"],
+            "citations": [],
+            "created_at": "2026-10-31T16:00:00Z",
+            "updated_at": "2026-10-31T16:00:00Z",
+        },
+    ]
+    for note in SYNTHETIC_NOTES:
+        await db.clinical_notes.update_one(
+            {"note_id": note["note_id"]},
+            {"$set": note},
+            upsert=True,
+        )
+
+    # 11. Seed Care-Team Tasks & Specialist Queries
+    logger.info("Seeding Care Team tasks and specialist queries...")
+    SYNTHETIC_TASKS = [
+        {
+            "task_id": "TSK-SYN-001",
+            "patient_id": "PAT-SYN-001",
+            "title": "Schedule Repeat BMP (Basic Metabolic Panel)",
+            "description": "Check potassium and serum creatinine prior to ACE-inhibitor adjustment.",
+            "assigned_to": "USR-VERIFIER-001",
+            "assigned_to_name": "Dr. Sarah Lin",
+            "assigned_by": "USR-DOC-CARDIO-001",
+            "assigned_by_name": "Dr. Marcus Vance",
+            "priority": "high",
+            "due_date": "2026-11-12",
+            "status": "pending",
+            "completed_at": None,
+            "created_at": "2026-11-01T08:00:00Z",
+            "updated_at": "2026-11-01T08:00:00Z",
+        },
+        {
+            "task_id": "TSK-SYN-002",
+            "patient_id": "PAT-SYN-001",
+            "title": "Reconcile Outpatient Discharge Pharmacy List",
+            "description": "Ensure Amlodipine is completely removed from community pharmacy dispensing profile.",
+            "assigned_to": "USR-DOC-CARDIO-001",
+            "assigned_to_name": "Dr. Marcus Vance",
+            "assigned_by": "USR-VERIFIER-001",
+            "assigned_by_name": "Dr. Sarah Lin",
+            "priority": "urgent",
+            "due_date": "2026-11-05",
+            "status": "in_progress",
+            "completed_at": None,
+            "created_at": "2026-10-31T10:00:00Z",
+            "updated_at": "2026-10-31T10:00:00Z",
+        },
+    ]
+    for task in SYNTHETIC_TASKS:
+        await db.clinical_tasks.update_one(
+            {"task_id": task["task_id"]},
+            {"$set": task},
+            upsert=True,
+        )
+
+    SYNTHETIC_QUERIES = [
+        {
+            "query_id": "QRY-SYN-001",
+            "patient_id": "PAT-SYN-001",
+            "from_doctor_id": "USR-DOC-CARDIO-001",
+            "from_doctor_name": "Dr. Marcus Vance",
+            "from_specialty": "Cardiology",
+            "to_doctor_id": "USR-VERIFIER-001",
+            "to_doctor_name": "Dr. Sarah Lin",
+            "to_specialty": "Internal Medicine",
+            "subject": "Renal titration threshold with Lisinopril",
+            "question": "Sarah, Eleanor's creatinine is 1.4 mg/dL. Can we safely maintain Lisinopril 10mg or should we consider an ARB or hydralazine-nitrate alternative?",
+            "priority": "routine",
+            "status": "answered",
+            "responses": [
+                {
+                    "response_id": "RESP-SYN-001",
+                    "doctor_id": "USR-VERIFIER-001",
+                    "doctor_name": "Dr. Sarah Lin",
+                    "specialty": "Internal Medicine",
+                    "answer": "Marcus, let's keep Lisinopril 10mg for now but repeat BMP in 10 days. If creatinine rises >30% (above 1.8), we will switch to hydralazine/isosorbide dinitrate.",
+                    "created_at": "2026-11-01T14:30:00Z",
+                }
+            ],
+            "created_at": "2026-11-01T09:00:00Z",
+            "updated_at": "2026-11-01T14:30:00Z",
+        }
+    ]
+    for qry in SYNTHETIC_QUERIES:
+        await db.specialist_queries.update_one(
+            {"query_id": qry["query_id"]},
+            {"$set": qry},
+            upsert=True,
+        )
+
+    # 12. Seed Clinical Notifications
+    SYNTHETIC_NOTIFS = [
+        {
+            "notification_id": "NOTIF-SYN-001",
+            "recipient_id": "USR-VERIFIER-001",
+            "patient_id": "PAT-SYN-001",
+            "type": "task_assigned",
+            "title": "New Clinical Task: Schedule Repeat BMP",
+            "message": "Dr. Marcus Vance assigned you a high-priority task due on 2026-11-12.",
+            "link": "/patients/PAT-SYN-001/workspace",
+            "read": False,
+            "created_at": "2026-11-01T08:00:00Z",
+        },
+        {
+            "notification_id": "NOTIF-SYN-002",
+            "recipient_id": "USR-DOC-CARDIO-001",
+            "patient_id": "PAT-SYN-001",
+            "type": "query_answered",
+            "title": "Specialist Query Answered: Renal titration threshold with Lisinopril",
+            "message": "Dr. Sarah Lin provided an answer to your clinical inquiry.",
+            "link": "/patients/PAT-SYN-001/workspace",
+            "read": False,
+            "created_at": "2026-11-01T14:30:00Z",
+        },
+    ]
+    for ntf in SYNTHETIC_NOTIFS:
+        await db.clinical_notifications.update_one(
+            {"notification_id": ntf["notification_id"]},
+            {"$set": ntf},
+            upsert=True,
+        )
+
+    # 13. Seed Synthetic Untrusted Document with Human Corrections for Metrics Dashboard
+    SYNTHETIC_DOC = {
+        "document_id": "DOC-SYN-84920-01",
+        "patient_id": "PAT-SYN-001",
+        "original_filename": "cardiology_discharge_summary.pdf",
+        "status": "approved",
+        "fields": [
+            {"field_name": "medication_name", "value": "Metoprolol Tartrate", "status": "explicit"},
+            {"field_name": "dosage", "value": "25 mg PO BID", "status": "explicit"},
+            {"field_name": "frequency", "value": "Twice daily", "status": "explicit"},
+            {"field_name": "allergy", "value": "Penicillin, Sulfa drugs", "status": "explicit"},
+            {"field_name": "primary_diagnosis", "value": "Paroxysmal atrial fibrillation", "status": "explicit"},
+            {"field_name": "discharge_date", "value": "2026-10-18", "status": "explicit"},
+        ],
+        "human_corrections": [
+            {
+                "field_name": "dosage",
+                "original_value": "25 mg daily",
+                "corrected_value": "25 mg PO BID",
+                "reason": "Clarified frequency from inpatient telemetry notes",
+                "corrected_by": "USR-VERIFIER-001",
+                "corrected_at": "2026-10-18T15:20:00Z",
+            },
+            {
+                "field_name": "allergy",
+                "original_value": "Sulfa only",
+                "corrected_value": "Penicillin, Sulfa drugs",
+                "reason": "Reconciled childhood penicillin anaphylaxis from historical intake",
+                "corrected_by": "USR-VERIFIER-001",
+                "corrected_at": "2026-10-18T15:25:00Z",
+            },
+        ],
+        "uploaded_at": "2026-10-18T14:00:00Z",
+    }
+    await db.untrusted_documents.update_one(
+        {"document_id": SYNTHETIC_DOC["document_id"]},
+        {"$set": SYNTHETIC_DOC},
+        upsert=True,
+    )
+
+    # 14. Clear any transient timeline conflicts for clean baseline
     await db.timeline_conflicts.delete_many({})
 
     client.close()

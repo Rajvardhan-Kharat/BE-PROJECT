@@ -1,6 +1,7 @@
 import React from 'react'
 import { AlertCircle, User, ShieldCheck, LogOut } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { NotificationDropdown } from './NotificationDropdown'
 
 export interface PatientContext {
   id: string
@@ -75,8 +76,10 @@ export const TopBar: React.FC<TopBarProps> = ({ patient = defaultPatient }) => {
         )}
       </div>
 
-      {/* Right metadata: Consent, Active User & Sign out */}
+      {/* Right metadata: Notifications, Consent, Active User & Sign out */}
       <div className="flex items-center gap-3 text-xs">
+        <NotificationDropdown />
+
         <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 border border-teal-200 text-teal-800 text-2xs font-medium">
           <ShieldCheck className="w-3 h-3 text-teal-700" />
           <span>Care Team Consent Active</span>

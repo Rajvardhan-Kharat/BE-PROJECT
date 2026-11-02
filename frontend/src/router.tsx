@@ -19,9 +19,12 @@ import { BreakGlassEmergencyViewPage } from './pages/BreakGlassEmergencyViewPage
 import { AdminBreakGlassReviewPage } from './pages/AdminBreakGlassReviewPage'
 import { AriaChatPage } from './pages/AriaChatPage'
 import { AriaSharingPage } from './pages/AriaSharingPage'
+import { FollowUpTrackerPage } from './pages/FollowUpTrackerPage'
+import { CollaborationWorkspacePage } from './pages/CollaborationWorkspacePage'
+import { CorrectionDashboardPage } from './pages/CorrectionDashboardPage'
 import { DevUiPage } from './pages/DevUiPage'
 import { EmptyState } from './components/ui/EmptyState'
-import { CheckSquare, ScrollText } from 'lucide-react'
+import { ScrollText } from 'lucide-react'
 
 export const router = createBrowserRouter([
   {
@@ -141,20 +144,50 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'follow-ups',
+        element: <FollowUpTrackerPage />,
+      },
+      {
+        path: 'patients/:id/follow-ups',
+        element: <FollowUpTrackerPage />,
+      },
+      {
+        path: 'workspace',
+        element: (
+          <ProtectedRoute allowedRoles={['doctor', 'senior_doctor', 'system_admin']}>
+            <CollaborationWorkspacePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'patients/:id/workspace',
+        element: (
+          <ProtectedRoute allowedRoles={['doctor', 'senior_doctor', 'system_admin']}>
+            <CollaborationWorkspacePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'corrections',
+        element: (
+          <ProtectedRoute allowedRoles={['doctor', 'senior_doctor', 'hospital_admin', 'system_admin']}>
+            <CorrectionDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'metrics/corrections',
+        element: (
+          <ProtectedRoute allowedRoles={['doctor', 'senior_doctor', 'hospital_admin', 'system_admin']}>
+            <CorrectionDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: 'worklist',
         element: (
-          <ProtectedRoute allowedRoles={['doctor', 'senior_doctor']}>
-            <div className="space-y-4">
-              <h1 className="text-xl font-semibold text-slate-900">Clinical Worklist</h1>
-              <p className="text-xs text-slate-500">
-                Active clinician tasks scoped to your care team.
-              </p>
-              <EmptyState
-                icon={<CheckSquare className="w-4 h-4 text-slate-500" />}
-                title="Worklist empty"
-                description="No active clinical tasks scheduled for your care team."
-              />
-            </div>
+          <ProtectedRoute allowedRoles={['doctor', 'senior_doctor', 'system_admin']}>
+            <CollaborationWorkspacePage />
           </ProtectedRoute>
         ),
       },

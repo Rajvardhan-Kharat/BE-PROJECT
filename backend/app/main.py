@@ -20,6 +20,9 @@ from backend.app.api.v1.protected_demo import router as protected_router
 from backend.app.api.v1.safety import router as safety_router
 from backend.app.api.v1.timeline_audit import router as timeline_audit_router
 from backend.app.api.v1.verification import router as verification_router
+from backend.app.api.v1.followups import router as followups_router
+from backend.app.api.v1.collaboration import router as collaboration_router
+from backend.app.api.v1.corrections_metrics import router as corrections_metrics_router
 from backend.app.core.config import settings
 from backend.app.core.database import close_mongo_connection, connect_to_mongo
 
@@ -132,6 +135,9 @@ app.include_router(agent_runs_router, prefix=api_v1_str, tags=["Agent Execution 
 app.include_router(audit_router, prefix=api_v1_str, tags=["Audit Trail"])
 app.include_router(protected_router, prefix=api_v1_str, tags=["RBAC Protected"])
 app.include_router(aria_router, prefix=api_v1_str, tags=["Aria Mental Health Companion"])
+app.include_router(followups_router, prefix=api_v1_str, tags=["Follow-up & Medication-Course Tracking"])
+app.include_router(collaboration_router, prefix=api_v1_str, tags=["Second Memory & Care-Team Collaboration"])
+app.include_router(corrections_metrics_router, prefix=api_v1_str, tags=["Verification Correction Metrics"])
 
 
 @app.get("/")

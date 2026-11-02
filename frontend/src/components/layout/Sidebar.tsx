@@ -17,6 +17,8 @@ import {
   ShieldCheck,
   Lock,
   HeartHandshake,
+  CalendarClock,
+  MessageSquare,
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useAuth } from '../../context/AuthContext'
@@ -85,6 +87,27 @@ export const Sidebar: React.FC = () => {
       label: 'Emergency summary',
       icon: HeartPulse,
       roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'follow-ups',
+      path: '/follow-ups',
+      label: 'Follow-up tracker',
+      icon: CalendarClock,
+      roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
+    },
+    {
+      id: 'workspace',
+      path: '/workspace',
+      label: 'Care-team workspace',
+      icon: MessageSquare,
+      roles: ['doctor', 'senior_doctor', 'system_admin'] as UserRole[],
+    },
+    {
+      id: 'corrections-dashboard',
+      path: '/corrections',
+      label: 'Correction metrics',
+      icon: FileCheck2,
+      roles: ['doctor', 'senior_doctor', 'hospital_admin', 'system_admin'] as UserRole[],
     },
     {
       id: 'consent-settings',

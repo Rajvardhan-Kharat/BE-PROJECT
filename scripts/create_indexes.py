@@ -165,6 +165,38 @@ async def create_indexes():
         IndexModel([("patient_id", ASCENDING), ("recipient_id", ASCENDING), ("status", ASCENDING)], name="idx_aria_auth_pat_recip_status"),
     ])
 
+    logger.info("Creating indexes for Follow-ups, Collaboration, and Second Memory...")
+    await db.follow_ups.create_indexes([
+        IndexModel([("follow_up_id", ASCENDING)], unique=True, name="idx_followups_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_followups_pat_status"),
+        IndexModel([("due_date", ASCENDING)], name="idx_followups_due_date"),
+        IndexModel([("type", ASCENDING)], name="idx_followups_type"),
+    ])
+    await db.clinical_notes.create_indexes([
+        IndexModel([("note_id", ASCENDING)], unique=True, name="idx_clinical_notes_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("is_private", ASCENDING)], name="idx_notes_pat_priv"),
+        IndexModel([("author_id", ASCENDING)], name="idx_notes_author"),
+        IndexModel([("created_at", ASCENDING)], name="idx_notes_created_at"),
+        IndexModel([("tags", ASCENDING)], name="idx_notes_tags"),
+    ])
+    await db.clinical_tasks.create_indexes([
+        IndexModel([("task_id", ASCENDING)], unique=True, name="idx_clinical_tasks_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_tasks_pat_status"),
+        IndexModel([("assigned_to", ASCENDING), ("status", ASCENDING)], name="idx_tasks_assignee_status"),
+        IndexModel([("due_date", ASCENDING)], name="idx_tasks_due_date"),
+    ])
+    await db.specialist_queries.create_indexes([
+        IndexModel([("query_id", ASCENDING)], unique=True, name="idx_specialist_queries_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_queries_pat_status"),
+        IndexModel([("from_doctor_id", ASCENDING)], name="idx_queries_from_doc"),
+        IndexModel([("to_doctor_id", ASCENDING)], name="idx_queries_to_doc"),
+    ])
+    await db.clinical_notifications.create_indexes([
+        IndexModel([("notification_id", ASCENDING)], unique=True, name="idx_notifications_id_unique"),
+        IndexModel([("recipient_id", ASCENDING), ("read", ASCENDING)], name="idx_notifications_recip_read"),
+        IndexModel([("created_at", ASCENDING)], name="idx_notifications_created_at"),
+    ])
+
     client.close()
     logger.info("All MongoDB indexes created successfully.")
 
