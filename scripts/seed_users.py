@@ -161,6 +161,70 @@ CARE_TEAM_MEMBERSHIPS = [
 ]
 
 SYNTHETIC_ENCOUNTERS = [
+    # Scenario Event 1: Eleanor Vance at Metro Health (Hospital A) - Oct 2
+    {
+        "encounter_id": "ENC-2026-072",
+        "patient_id": "PAT-SYN-001",
+        "hospital_id": "HOSP-METRO-01",
+        "department": "Cardiology",
+        "attending_doctor_id": "USR-DOC-CARDIO-001",
+        "attending_doctor_name": "Dr. Marcus Vance",
+        "encounter_type": "Inpatient Admission",
+        "admission_date": "2026-10-02 09:30",
+        "discharge_date": "2026-10-04 16:00",
+        "status": "completed",
+        "chief_complaint": "Acute hypertension workup; initiated Amlodipine 10mg daily.",
+        "diagnosis_codes": ["I10 (Essential hypertension)"],
+        "is_synthetic": True,
+    },
+    # Scenario Event 2: Specialist Outpatient Consultation - Oct 8
+    {
+        "encounter_id": "ENC-2026-078",
+        "patient_id": "PAT-SYN-001",
+        "hospital_id": "HOSP-METRO-01",
+        "department": "Cardiology",
+        "attending_doctor_id": "USR-DOC-CARDIO-001",
+        "attending_doctor_name": "Dr. Marcus Vance (Specialist)",
+        "encounter_type": "Specialist Consultation",
+        "admission_date": "2026-10-08 14:15",
+        "discharge_date": "2026-10-08 15:30",
+        "status": "completed",
+        "chief_complaint": "Follow-up adverse reaction: Severe bilateral lower extremity edema. Discontinued Amlodipine.",
+        "diagnosis_codes": ["R60.0 (Localized edema, bilateral lower extremity)"],
+        "is_synthetic": True,
+    },
+    # Scenario Event 3: Hospital B (Valley Clinic) - Legacy Chart Import - Oct 12
+    {
+        "encounter_id": "ENC-2026-088",
+        "patient_id": "PAT-SYN-001",
+        "hospital_id": "HOSP-VALLEY-02",
+        "department": "Primary Care / Records Intake",
+        "attending_doctor_id": "USR-ED-VALLEY-01",
+        "attending_doctor_name": "Dr. David Miller",
+        "encounter_type": "Chart Import Intake",
+        "admission_date": "2026-10-12 11:00",
+        "discharge_date": "2026-10-12 11:45",
+        "status": "completed",
+        "chief_complaint": "Intake registration; imported prior outpatient medication list showing active Amlodipine.",
+        "diagnosis_codes": ["Z76.89 (Persons encountering health services in other specified circumstances)"],
+        "is_synthetic": True,
+    },
+    # Date Anomaly Demonstration Encounter
+    {
+        "encounter_id": "ENC-2026-099",
+        "patient_id": "PAT-SYN-001",
+        "hospital_id": "HOSP-VALLEY-02",
+        "department": "Urgent Care",
+        "attending_doctor_id": "USR-ED-VALLEY-01",
+        "attending_doctor_name": "Dr. David Miller",
+        "encounter_type": "Urgent Care Walk-in",
+        "admission_date": "2026-10-25 18:30",
+        "discharge_date": "2026-10-25 14:00",  # Inconsistent date: discharge before admission!
+        "status": "completed",
+        "chief_complaint": "Sprained ankle evaluation with temporal audit discrepancy.",
+        "diagnosis_codes": ["S93.401A (Sprain of unspecified ligament of right ankle)"],
+        "is_synthetic": True,
+    },
     # Eleanor Vance - Encounter 1 at Metro Health (Inpatient Cardiology)
     {
         "encounter_id": "ENC-2026-081",
@@ -606,6 +670,55 @@ async def seed_all():
             "hospital_id": "HOSP-METRO-01",
             "notes": "Lipid management",
         },
+        # -------------------------------------------------------------
+        # SCENARIO: Hospital A (Oct 2) -> Specialist Discontinues (Oct 8) -> Hospital B Imports Older List (Oct 12)
+        # -------------------------------------------------------------
+        {
+            "prescription_id": "RX-PAT001-SCENARIO-01",
+            "patient_id": "PAT-SYN-001",
+            "encounter_id": "ENC-2026-072",
+            "drug_name": "Amlodipine (Medication X)",
+            "dosage": "10 mg",
+            "frequency": "daily",
+            "route": "PO",
+            "duration_days": 90,
+            "status": "active",
+            "start_date": "2026-10-02",
+            "prescribed_by": "Dr. Marcus Vance",
+            "hospital_id": "HOSP-METRO-01",
+            "notes": "Hospital A (Metro Health) Inpatient blood pressure management order",
+        },
+        {
+            "prescription_id": "RX-PAT001-SCENARIO-02",
+            "patient_id": "PAT-SYN-001",
+            "encounter_id": "ENC-2026-078",
+            "drug_name": "Amlodipine (Medication X)",
+            "dosage": "10 mg",
+            "frequency": "daily",
+            "route": "PO",
+            "duration_days": None,
+            "status": "discontinued",
+            "start_date": "2026-10-08",
+            "prescribed_by": "Dr. Marcus Vance (Specialist)",
+            "hospital_id": "HOSP-METRO-01",
+            "discontinuation_reason": "Specialist discontinuation: Refractory bilateral peripheral lower extremity edema. Discontinue calcium channel blocker therapy.",
+            "notes": "Discontinued on Oct 8 by cardiology specialist due to side effects",
+        },
+        {
+            "prescription_id": "RX-PAT001-SCENARIO-03",
+            "patient_id": "PAT-SYN-001",
+            "encounter_id": "ENC-2026-088",
+            "drug_name": "Amlodipine (Medication X)",
+            "dosage": "10 mg",
+            "frequency": "daily",
+            "route": "PO",
+            "duration_days": 30,
+            "status": "active",
+            "start_date": "2026-10-12",
+            "prescribed_by": "Dr. David Miller (Valley Intake)",
+            "hospital_id": "HOSP-VALLEY-02",
+            "notes": "Hospital B (Valley Clinic) imported legacy medication list without cross-hospital reconciliation",
+        },
     ]
     for rx in SYNTHETIC_PRESCRIPTIONS:
         await db.prescriptions.update_one(
@@ -613,6 +726,9 @@ async def seed_all():
             {"$set": rx},
             upsert=True,
         )
+
+    # 9. Clear any transient timeline conflicts for clean baseline
+    await db.timeline_conflicts.delete_many({})
 
     client.close()
     logger.info("Database seeding completed successfully.")

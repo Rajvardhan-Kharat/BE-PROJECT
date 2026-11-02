@@ -13,6 +13,7 @@ from backend.app.api.v1.health import router as health_router
 from backend.app.api.v1.patients import router as patients_router
 from backend.app.api.v1.protected_demo import router as protected_router
 from backend.app.api.v1.safety import router as safety_router
+from backend.app.api.v1.timeline_audit import router as timeline_audit_router
 from backend.app.api.v1.verification import router as verification_router
 from backend.app.core.config import settings
 from backend.app.core.database import close_mongo_connection, connect_to_mongo
@@ -118,6 +119,7 @@ app.include_router(patients_router, prefix=api_v1_str, tags=["Patients"])
 app.include_router(documents_router, prefix=api_v1_str, tags=["Documents & Extraction"])
 app.include_router(verification_router, prefix=api_v1_str, tags=["Clinical Verification"])
 app.include_router(safety_router, prefix=api_v1_str, tags=["Clinical Safety & Conflict Detection"])
+app.include_router(timeline_audit_router, prefix=api_v1_str, tags=["Timeline Conflict Audit"])
 app.include_router(audit_router, prefix=api_v1_str, tags=["Audit Trail"])
 app.include_router(protected_router, prefix=api_v1_str, tags=["RBAC Protected"])
 

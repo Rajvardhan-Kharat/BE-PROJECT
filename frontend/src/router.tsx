@@ -10,6 +10,7 @@ import { ExtractionReviewPage } from './pages/ExtractionReviewPage'
 import { VerificationQueuePage } from './pages/VerificationQueuePage'
 import { RecordComparisonPage } from './pages/RecordComparisonPage'
 import { MedicationSafetyPage } from './pages/MedicationSafetyPage'
+import { TimelineAuditPage } from './pages/TimelineAuditPage'
 import { DevUiPage } from './pages/DevUiPage'
 import { EmptyState } from './components/ui/EmptyState'
 import { CheckSquare, ScrollText } from 'lucide-react'
@@ -48,8 +49,16 @@ export const router = createBrowserRouter([
         element: <MedicationSafetyPage />,
       },
       {
+        path: 'patients/:id/timeline',
+        element: <TimelineAuditPage />,
+      },
+      {
         path: 'safety',
         element: <MedicationSafetyPage />,
+      },
+      {
+        path: 'timeline',
+        element: <TimelineAuditPage />,
       },
       {
         path: 'upload',

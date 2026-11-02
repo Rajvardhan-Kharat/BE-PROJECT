@@ -37,7 +37,9 @@
     "motrin": "ibuprofen",
     "aleve": "naproxen",
     "toradol": "ketorolac",
-    "tylenol": "acetaminophen"
+    "tylenol": "acetaminophen",
+    "norvasc": "amlodipine",
+    "medication x": "amlodipine"
   },
   "allergy_classes": {
     "penicillin": {

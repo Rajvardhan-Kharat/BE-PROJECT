@@ -209,9 +209,10 @@ async def test_contradictory_status_across_encounters(client: AsyncClient):
 
     status_conflicts = [a for a in data["alerts"] if a["rule_id"] == "STATUS-CONFLICT-001"]
     assert len(status_conflicts) >= 1
-    alert = status_conflicts[0]
-    assert alert["type"] == "data_inconsistency"
-    assert "furosemide" in alert["explanation"].lower()
+    furo_alert = next((a for a in status_conflicts if "furosemide" in a["explanation"].lower()), None)
+    assert furo_alert is not None
+    assert furo_alert["type"] == "data_inconsistency"
+    assert "furosemide" in furo_alert["explanation"].lower()
 
 
 @pytest.mark.asyncio

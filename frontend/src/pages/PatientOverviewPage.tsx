@@ -21,6 +21,7 @@ import {
   FileCheck2,
   ArrowRight,
   Pill,
+  History,
 } from 'lucide-react'
 
 export const PatientOverviewPage: React.FC = () => {
@@ -114,14 +115,22 @@ export const PatientOverviewPage: React.FC = () => {
         >
           Back to directory
         </Button>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<History className="w-3.5 h-3.5 text-teal-700" />}
+            onClick={() => navigate(`/patients/${patient.patient_id}/timeline`)}
+          >
+            Timeline Conflict Audit
+          </Button>
           <Button
             size="sm"
             variant="secondary"
             icon={<Pill className="w-3.5 h-3.5 text-teal-700" />}
             onClick={() => navigate(`/patients/${patient.patient_id}/safety`)}
           >
-            Medication Safety & Conflicts
+            Medication Safety
           </Button>
           <span className="text-2xs font-mono text-slate-400">
             Internal ID: {patient.patient_id}

@@ -104,6 +104,13 @@ async def create_indexes():
         IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_prescriptions_patient_status"),
     ])
 
+    logger.info("Creating indexes for collection 'timeline_conflicts'...")
+    await db.timeline_conflicts.create_indexes([
+        IndexModel([("conflict_id", ASCENDING)], unique=True, name="idx_timeline_conflicts_id_unique"),
+        IndexModel([("patient_id", ASCENDING), ("status", ASCENDING)], name="idx_timeline_conflicts_patient_status"),
+        IndexModel([("rule_id", ASCENDING)], name="idx_timeline_conflicts_rule_id"),
+    ])
+
     client.close()
     logger.info("All MongoDB indexes created successfully.")
 

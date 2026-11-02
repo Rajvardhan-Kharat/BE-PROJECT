@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   UploadCloud,
   FileCheck2,
+  History,
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useAuth } from '../../context/AuthContext'
@@ -65,6 +66,13 @@ export const Sidebar: React.FC = () => {
       label: 'Medication safety',
       icon: ShieldAlert,
       roles: ['patient', 'doctor', 'senior_doctor', 'system_admin'] as UserRole[],
+    },
+    {
+      id: 'timeline-audit',
+      path: '/timeline',
+      label: 'Timeline audit',
+      icon: History,
+      roles: ['patient', 'doctor', 'senior_doctor', 'system_admin', 'hospital_admin'] as UserRole[],
     },
     {
       id: 'worklist',
