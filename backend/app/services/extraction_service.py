@@ -13,6 +13,8 @@ from backend.app.schemas.extraction import (
     SourceSpan,
 )
 from backend.app.services.pdf_service import PDFExtractionResult, pdf_service
+from backend.app.safety.prompt_injection_detector import prompt_injection_detector
+from backend.app.services.audit_service import audit_service
 
 logger = logging.getLogger("vericare.extraction")
 
@@ -30,17 +32,59 @@ class ExtractionService:
         patient_id: str,
         pdf_extraction: PDFExtractionResult,
         content_hash: str,
+        uploader_user_id: Optional[str] = None,
+        uploader_role: Optional[str] = None,
+        client_ip: Optional[str] = None,
     ) -> ExtractionDocumentResult:
         """
         Executes bounded extraction workflow:
-          1. Calls LLM provider abstraction (gracefully handling outages)
-          2. Parses output with bounded repair loop (max 2 attempts)
-          3. MANDATORY: Validates every source span quote against document text offsets
+          1. Pre-scans for adversarial prompt injections and unlisted tool requests
+          2. Calls LLM provider abstraction (gracefully handling outages)
+          3. Parses output with bounded repair loop (max 2 attempts)
+          4. MANDATORY: Validates every source span quote against document text offsets
              Downgrades and rejects ungrounded/hallucinated spans
-          4. Returns result with status strictly 'pending_review'
+          5. Enforces security invariants: strictly 'pending_review', never 'approved', logs incidents
         """
         provider = self.get_provider()
         now_str = datetime.now(timezone.utc).isoformat()
+
+        # Step 0: Adversarial Prompt Injection & Tool Allowlist Scan
+        detection = prompt_injection_detector.analyze_document_text(
+            text=pdf_extraction.full_text,
+            page_map=pdf_extraction.page_map,
+            doc_id=document_id,
+        )
+
+        if detection.is_malicious:
+            logger.warning(
+                "ADVERSARIAL PROMPT INJECTION DETECTED in doc %s for patient %s. Incident type: %s. Patterns: %s",
+                document_id,
+                patient_id,
+                detection.incident_type,
+                detection.detected_patterns,
+            )
+            try:
+                await audit_service.log_security_incident(
+                    incident_type=detection.incident_type or "prompt_injection",
+                    document_id=document_id,
+                    patient_id=patient_id,
+                    user_id=uploader_user_id,
+                    role=uploader_role,
+                    detected_patterns=detection.detected_patterns,
+                    action_taken="Adversarial content isolated as inert quoted text. Tool calls refused. Kept in pending_review.",
+                    details={
+                        "attempted_status_override": detection.attempted_status_override,
+                        "attempted_permission_escalation": detection.attempted_permission_escalation,
+                        "attempted_cross_patient_exfil": detection.attempted_cross_patient_exfil,
+                        "attempted_allergy_deletion": detection.attempted_allergy_deletion,
+                        "multilingual_injection": detection.multilingual_injection,
+                        "context_overflow_injection": detection.context_overflow_injection,
+                        "unlisted_tools_requested": detection.unlisted_tools_requested,
+                    },
+                    ip_address=client_ip,
+                )
+            except Exception as audit_err:
+                logger.error("Failed to log security incident audit event: %s", audit_err)
 
         # Step 1: Call LLM Provider
         try:
@@ -146,11 +190,21 @@ class ExtractionService:
                 value = item.get("value")
                 confidence_note = str(item.get("confidence_note") or "")
                 raw_status = str(item.get("status") or "uncertain").lower()
-                status = (
-                    raw_status
-                    if raw_status in ["explicit", "inferred", "uncertain", "missing", "conflicting"]
-                    else "uncertain"
-                )
+                if raw_status == "approved":
+                    logger.warning(
+                        "FORBIDDEN STATUS 'approved' attempted on field '%s'. Forcibly downgrading to 'uncertain'.",
+                        field_name,
+                    )
+                    status = "uncertain"
+                    confidence_note = (
+                        f"[SECURITY OVERRIDE: Status 'approved' is prohibited in extraction results] {confidence_note}"
+                    )
+                else:
+                    status = (
+                        raw_status
+                        if raw_status in ["explicit", "inferred", "uncertain", "missing", "conflicting"]
+                        else "uncertain"
+                    )
 
                 raw_span = item.get("source_span")
                 source_span: Optional[SourceSpan] = None
@@ -215,6 +269,46 @@ class ExtractionService:
                 )
             except Exception as f_err:
                 logger.error("Error parsing clinical field item %d: %s", idx, f_err)
+
+        # Step 4: Ensure all detected adversarial snippets appear as quoted content flagged for reviewer
+        if detection.is_malicious:
+            existing_quotes = {f.source_span.quote for f in validated_fields if f.source_span and f.source_span.quote}
+            for snippet in detection.injected_snippets:
+                quote = snippet["quote"]
+                if quote not in existing_quotes:
+                    is_valid, _ = pdf_service.verify_quote_at_offset(
+                        page_num=snippet["page"],
+                        start_char=snippet["start"],
+                        end_char=snippet["end"],
+                        quote=quote,
+                        page_map=pdf_extraction.page_map,
+                    )
+                    source_span = (
+                        SourceSpan(
+                            doc=document_id,
+                            page=snippet["page"],
+                            start=snippet["start"],
+                            end=snippet["end"],
+                            quote=quote,
+                        )
+                        if is_valid
+                        else None
+                    )
+
+                    validated_fields.append(
+                        ExtractedField(
+                            field_name="untrusted_adversarial_instruction",
+                            value=quote,
+                            confidence_note=(
+                                f"[SECURITY ADVISORY: Potential Prompt Injection / Adversarial Instruction Detected ({snippet['category']}) - "
+                                f"Quoted as inert text for clinician review. Action was blocked.]"
+                            ),
+                            status="uncertain",
+                            source_span=source_span,
+                            grounding_verified=is_valid,
+                        )
+                    )
+                    existing_quotes.add(quote)
 
         return ExtractionDocumentResult(
             document_id=document_id,

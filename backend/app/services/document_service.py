@@ -142,6 +142,9 @@ class DocumentService:
             patient_id=patient_id,
             pdf_extraction=pdf_extraction,
             content_hash=content_hash,
+            uploader_user_id=user.get("user_id"),
+            uploader_role=user.get("role"),
+            client_ip=client_ip,
         )
 
         # 8. Store extraction in untrusted_documents collection (pending_review)

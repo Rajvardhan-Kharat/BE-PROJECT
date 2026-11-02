@@ -257,5 +257,49 @@ class AuditService:
             results.append(doc)
         return results
 
+    async def log_security_incident(
+        self,
+        incident_type: str,
+        document_id: str,
+        patient_id: str,
+        detected_patterns: list,
+        action_taken: str,
+        user_id: Optional[str] = None,
+        role: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        ip_address: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Logs an immutable HIGH-PRIORITY security incident for prompt injection,
+        unauthorized tool execution requests, or adversarial document content.
+        """
+        record = {
+            "event_type": "SECURITY_INCIDENT_PROMPT_INJECTION",
+            "priority": "HIGH",
+            "severity": "CRITICAL",
+            "user_id": user_id,
+            "role": role,
+            "status": "INCIDENT_LOGGED_AND_BLOCKED",
+            "ip_address": ip_address,
+            "timestamp": datetime.now(timezone.utc),
+            "details": {
+                "incident_type": incident_type,
+                "document_id": document_id,
+                "patient_id": patient_id,
+                "detected_patterns": detected_patterns,
+                "action_taken": action_taken,
+                **(details or {}),
+            },
+        }
+        event = await self.repo.append_event(record)
+        logger.warning(
+            "CRITICAL SECURITY AUDIT [PROMPT_INJECTION_DETECTED] doc=%s patient=%s type=%s patterns=%s",
+            document_id,
+            patient_id,
+            incident_type,
+            detected_patterns,
+        )
+        return event
+
 
 audit_service = AuditService()
